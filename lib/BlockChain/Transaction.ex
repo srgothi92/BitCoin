@@ -21,4 +21,8 @@ defmodule BITCOIN.BlockChain.Transaction do
           outputs: list(TxOutput.t()),
           lock_time: non_neg_integer
         }
+
+  def createTransaction() do
+
+  end
 end
