@@ -1,6 +1,5 @@
 defmodule BITCOIN.BlockChain.TransactionVerify do
-  import BITCOIN.Wallet.KeyHandler
-  alias BITCOIN.BlockChain.{Transaction, TxInput}
+  alias BITCOIN.BlockChain.{Transaction, TxInput, KeyHandler}
 
   @spec validateTransactions([Transaction], [Transaction]) :: :ok | {:error, atom}
   def validateTransactions(currentTxs, previousBlockTxs) do
@@ -82,8 +81,21 @@ defmodule BITCOIN.BlockChain.TransactionVerify do
   end
 
   defp validateInvalidOwnership(%Transaction{} = tx, previousBlockTxs) do
-    !Enum.any?(tx.inputs,fn input ->
-      findPreviousTx(input, previousBlockTxs).hash == publicKeyHash(tx.hash)
+    address = KeyHandler.publicKeyHash(tx.public_key)
+    !Enum.reduce(tx.inputs,fn input ->
+      # check owership of each input is same as person authorizing the transaction
+      prevTx = findPreviousTx(input, previousBlockTxs)
+      prevOutput = Enum.at(prevTx.outputs, input.index)
+      if(prevOutput.wallet_address != address) do
+        {:error, :invalid_input_owner}
+      end
+      message = Transaction.serializeTx(tx)
+      bSignature = KeyHandler.verifySignature(tx.public_key, tx.sign_tx, message)
+      if bSignature do
+        :ok
+      else
+        {:error, :invalid_tx_signature}
+      end
     end)
   end
 end

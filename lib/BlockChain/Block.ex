@@ -31,14 +31,25 @@ defmodule BITCOIN.BlockChain.Block do
     }
   end
 
-  def stringifyHeader(%__MODULE__{} = block) do
+  defp stringifyHeader(%__MODULE__{} = block) do
     block.previous_block <>
       Integer.to_string(block.timestamp) <>
       Integer.to_string(block.nonce) <> Integer.to_string(block.index)
   end
 
-  def hash(%__MODULE__{} = block) do
+  defp hash(%__MODULE__{} = block) do
     headerString = stringifyHeader(block)
     :crypto.hash(:sha256, :crypto.hash(:sha256, headerString))
+  end
+
+  def createBlock(previousHash, nonce, transactions) do
+    %__MODULE__{
+      previous_block: previousHash,
+      timestamp: :os.system_time(:millisecond),
+      nonce: nonce,
+      transactions: transactions,
+      index: 0,
+      hash: "0012345"
+    }
   end
 end

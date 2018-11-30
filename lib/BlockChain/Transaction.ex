@@ -27,10 +27,12 @@ defmodule BITCOIN.BlockChain.Transaction do
       inputs: inputs,
       outputs: outputs
     }
-    tx |> serializeTx() |> Wallet.sign(wallet)
+    sign =  tx |> serializeTx() |> Wallet.sign(wallet)
+    signedTx = %{tx | sign_tx: sign}
+    %{signedTx | hash: computeHash(signedTx)}
   end
 
-  defp serializeTx(%__MODULE__{} = tx) do
+  def serializeTx(%__MODULE__{} = tx) do
     inputSerialized = Enum.reduce(tx.inputs, "", fn input, acc ->
       acc <> input.previous_op_tx_hash <> Integer.to_string(input.index)
     end)
@@ -38,5 +40,9 @@ defmodule BITCOIN.BlockChain.Transaction do
       acc <> output.wallet_address <> Integer.to_string(output.value)
     end)
     inputSerialized <> outputSerialized <> tx.public_key
+  end
+
+  defp computeHash(tx) do
+    serializeTx(tx) <> tx.sign_tx
   end
 end
