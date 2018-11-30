@@ -8,7 +8,7 @@ defmodule BITCOIN.BlockChain.Chain do
   end
 
   def init(_) do
-    chain = []
+    chain = [Block.initialBlock()]
     {:ok, {chain}}
   end
 

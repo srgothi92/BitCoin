@@ -1,11 +1,13 @@
 defmodule BITCOIN.BlockChain.TxOutput do
   # Transaction Value (in satoshis)
-  defstruct value: 0,
-            # Usually contains the public key as a Bitcoin script setting up conditions to claim this output.
-            pk_script: <<>>
+  defstruct [
+    :value,
+    # Indentifier of user whose this output belongs too
+    :wallet_address
+  ]
 
   @type t :: %__MODULE__{
           value: non_neg_integer,
-          pk_script: binary
+          wallet_address: String.t()
         }
 end
