@@ -10,4 +10,11 @@ defmodule BITCOIN.BlockChain.TxInput do
           previous_op_tx_hash: String.t(),
           index: integer
         }
+
+  def createTxInput(hash, index) do
+    %__MODULE__{
+      previous_op_tx_hash: hash,
+      index: index
+    }
+  end
 end

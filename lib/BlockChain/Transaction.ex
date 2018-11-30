@@ -1,6 +1,6 @@
 defmodule BITCOIN.BlockChain.Transaction do
-  import BITCOIN.Wallet.Wallet
-  alias BITCOIN.Wallet.{Wallet, TxInput, TxOutput}
+  alias BITCOIN.Wallet.{Wallet}
+  alias BITCOIN.BlockChain.{TxInput, TxOutput}
   defstruct [
     :sign_tx,
     # public key of user who authorized this transaction
@@ -27,15 +27,15 @@ defmodule BITCOIN.BlockChain.Transaction do
       inputs: inputs,
       outputs: outputs
     }
-    tx |> serializeTx() |> sign(wallet)
+    tx |> serializeTx() |> Wallet.sign(wallet)
   end
 
   defp serializeTx(%__MODULE__{} = tx) do
     inputSerialized = Enum.reduce(tx.inputs, "", fn input, acc ->
-      acc = acc <> input.previous_op_tx_hash <> Integer.to_string(input.index)
+      acc <> input.previous_op_tx_hash <> Integer.to_string(input.index)
     end)
     outputSerialized = Enum.reduce(tx.outputs, "", fn output, acc ->
-      acc = acc <> output.wallet_address <> Integer.to_string(output.value)
+      acc <> output.wallet_address <> Integer.to_string(output.value)
     end)
     inputSerialized <> outputSerialized <> tx.public_key
   end
