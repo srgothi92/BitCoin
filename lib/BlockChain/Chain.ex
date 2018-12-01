@@ -42,6 +42,10 @@ defmodule BITCOIN.BlockChain.Chain do
     end
   end
 
+  def getLatestBlock() do
+    GenServer.call(__MODULE__, :getLatestBlock)
+  end
+
   def addBlock(%Block{} = block) do
     GenServer.call(__MODULE__, {:addBlock, block})
   end
@@ -52,6 +56,11 @@ defmodule BITCOIN.BlockChain.Chain do
 
   def getUnspentOutputsForUser(%Wallet{} = wallet) do
     GenServer.call(__MODULE__, {:getUnspentOutputsForUser, %Wallet{} = wallet})
+  end
+
+  def handle_call(:getLatestBlock, _from, {chain}) do
+    [prevBlock | _] = chain
+    prevBlock
   end
 
   def handle_call({:addBlock, %Block{} = block}, _from, {chain}) do
