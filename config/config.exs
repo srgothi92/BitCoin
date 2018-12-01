@@ -29,4 +29,4 @@ use Mix.Config
 #
 #     import_config "#{Mix.env()}.exs"
 config :bitcoin,
-:target,  2
+:target,  1

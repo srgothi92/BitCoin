@@ -62,6 +62,7 @@ defmodule BITCOIN.BlockChain.Chain do
   def handle_call(:getLatestBlock, _from, {chain}) do
     [prevBlock | _] = chain
     prevBlock
+    {:reply, prevBlock,  {chain}}
   end
 
   def handle_call({:addBlock, %Block{} = block}, _from, {chain}) do

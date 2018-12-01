@@ -13,7 +13,7 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
   end
 
   def addToQueue(%Transaction{} = tx) do
-    GenServer.cast(__MODULE__, {:addToQueue, tx})
+    GenServer.call(__MODULE__, {:addToQueue, tx})
   end
 
   def handle_cast({:addToQueue, tx}, {queue}) do
@@ -25,22 +25,31 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
   end
 
   defp createBlockAndAdd(queue) do
-    previousBlock = Chain.getLatestBlock()
+    IO.inspect("Su")
+    previousBlock = GenServer.call(:Chain,:getLatestBlock)
+    IO.inspect("Su")
     block = Block.createBlock(previousBlock.hash, queue)
+    IO.inspect("Su")
     {blockHash, nonce} = proofOfWork(block, :rand.uniform(32))
+    IO.inspect("Su")
     block = %{block | hash: blockHash}
+    IO.inspect("Su")
     block = %{block | nonce: nonce}
-    op = Chain.addBlock(block)
+    IO.inspect block
+    op = GenServer.call(:Chain,{:addBlock, block})
     Logger.info("New Block added #{inspect(op)}")
   end
 
   defp validateProofOfWork(hash) do
+    IO.inspect hash
     target = Application.get_env(:bitcoin, :target)
+    IO.inspect(target)
     String.slice(hash, 0, target) == String.duplicate("0", target)
   end
 
   def proofOfWork(%Block{} = block, nonce \\ 0) do
-    %{block | nonce: nonce}
+    block = %{block | nonce: nonce}
+
     blockHash = Block.hash(block)
       if(!validateProofOfWork(blockHash)) do
         proofOfWork(block, block.nonce + 1)
