@@ -1,5 +1,5 @@
 defmodule BITCOIN.BlockChain.Transaction do
-  alias BITCOIN.Wallet.{Wallet}
+  alias BITCOIN.Wallet.{Wallet, KeyHandler}
   alias BITCOIN.BlockChain.{TxInput, TxOutput}
   defstruct [
     :sign_tx,
@@ -23,13 +23,14 @@ defmodule BITCOIN.BlockChain.Transaction do
 
   def createTransaction(%Wallet{} = wallet, inputs, outputs) do
     tx = %__MODULE__{
-      hash: wallet.t(),
+      hash: wallet.address,
       inputs: inputs,
-      outputs: outputs
+      outputs: outputs,
+      public_key: wallet.public_key
     }
     sign =  tx |> serializeTx() |> Wallet.sign(wallet)
     signedTx = %{tx | sign_tx: sign}
-    %{signedTx | hash: computeHash(signedTx)}
+    %{signedTx | hash: hash(signedTx)}
   end
 
   def serializeTx(%__MODULE__{} = tx) do
@@ -42,7 +43,7 @@ defmodule BITCOIN.BlockChain.Transaction do
     inputSerialized <> outputSerialized <> tx.public_key
   end
 
-  defp computeHash(tx) do
-    serializeTx(tx) <> tx.sign_tx
+  def hash(tx) do
+    KeyHandler.hash(serializeTx(tx) <> tx.sign_tx)
   end
 end

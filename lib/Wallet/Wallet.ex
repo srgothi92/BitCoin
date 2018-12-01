@@ -14,6 +14,16 @@ defmodule BITCOIN.Wallet.Wallet do
     :private_key
   ]
 
+  def createWallet do
+    {publicKey, privateKey} = KeyHandler.keyPairGenerate
+
+    %__MODULE__ {
+      address: KeyHandler.publicKeyHash(publicKey),
+      public_key: publicKey,
+      private_key: privateKey
+    }
+  end
+
   # sign the transaction
   def sign(msg, %__MODULE__{private_key: pvKey}) do
     KeyHandler.signMessage(pvKey, msg)

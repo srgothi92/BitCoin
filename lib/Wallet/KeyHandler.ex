@@ -10,14 +10,20 @@ defmodule BITCOIN.Wallet.KeyHandler do
   end
 
   def signMessage(privateKey, message) do
-    :crypto.sign(@type_signature, @type_hash, message, [Base.decode16!(privateKey), @ecdsa_curve])
+    signedMessage = :crypto.sign(@type_signature, @type_hash, message, [Base.decode16!(privateKey), @ecdsa_curve])
+    Base.encode16(signedMessage)
   end
 
   def verifySignature(publicKey, signature, message) do
-    :crypto.verify(@type_signature, @type_hash, message, Base.decode16!(signature), [Base.decode16!(publicKey), @ecdsa_curve])
+    :crypto.verify(@type_signature, @type_hash,message,Base.decode16!(signature),[Base.decode16!(publicKey),@ecdsa_curve])
   end
 
   def publicKeyHash(publicKey) do
     :crypto.hash(:ripemd160, :crypto.hash(:sha256, publicKey)) |> Base.encode16()
+  end
+
+  def hash(message) do
+    :crypto.hash(:sha256,message)
+    |> Base.encode16()
   end
 end
