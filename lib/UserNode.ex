@@ -6,14 +6,15 @@ defmodule BITCOIN.UserNode do
    @doc """
   Starts the UserNode.
   """
-  def start_link(%Wallet{} = wallet) do
-    GenServer.start_link(__MODULE__, wallet, name: wallet.address)
+  def start_link() do
+    GenServer.start_link(__MODULE__,{})
   end
 
   @doc """
   Initiates the wallet for User Node.
   """
-  def init(%Wallet{} = wallet) do
+  def init(_) do
+    wallet = Wallet.createWallet()
     {:ok, wallet}
   end
 
@@ -27,5 +28,14 @@ defmodule BITCOIN.UserNode do
 
   def handle_call({:balance}, _from, wallet) do
     {:reply, wallet.balance(wallet), wallet}
+  end
+
+
+  def getWallet() do
+    GenServer.call(__MODULE__, :getWallet)
+  end
+
+  def handle_call(:getWallet,_from, wallet) do
+    {:reply, wallet, wallet}
   end
 end

@@ -1,6 +1,6 @@
 defmodule BITCOIN.Wallet.Wallet do
   alias BITCOIN.Wallet.KeyHandler
-  alias BITCOIN.BlockChain.{Chain, TxOutput, Transaction, TxInput}
+  alias BITCOIN.BlockChain.{Chain, TxOutput, Transaction, TxInput, TransactionQueue}
 
   @type t :: %__MODULE__{
           address: String.t(),
@@ -53,7 +53,8 @@ defmodule BITCOIN.Wallet.Wallet do
     txInputs = converToInputFormat(txInputs)
     txOutputs = [TxOutput.createTxOutput(recepient, amount)]
     txOutputs = [ txOutputs | calculateChangeOutputs(wallet, amount, txInputs) ]
-    Transaction.createTransaction(wallet, txInputs, txOutputs)
+    tx = Transaction.createTransaction(wallet, txInputs, txOutputs)
+    TransactionQueue.addToQueue(tx)
   end
 
   defp calculateChangeOutputs(%__MODULE__{} = wallet, amount, txInputs) do

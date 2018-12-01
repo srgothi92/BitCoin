@@ -21,6 +21,16 @@ defmodule BITCOIN.BlockChain.Transaction do
           outputs: list(TxOutput.t())
         }
 
+  def initialDummyTransaction(outputs) do
+    tx = %__MODULE__{
+      inputs: [TxInput.createTxInput("Abc", 0)],
+      outputs: outputs,
+      public_key: "",
+      sign_tx: ""
+    }
+    %{tx | hash: hash(tx)}
+  end
+
   def createTransaction(%Wallet{} = wallet, inputs, outputs) do
     tx = %__MODULE__{
       hash: wallet.address,
