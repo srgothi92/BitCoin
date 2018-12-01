@@ -23,11 +23,11 @@ defmodule BITCOIN.UserNode do
   end
 
   def handle_call({:send, amount, recipient}, _from, wallet) do
-    {:reply, wallet.send(wallet, amount, recipient), wallet}
+    {:reply, Wallet.send(wallet, amount, recipient), wallet}
   end
 
-  def handle_call({:balance}, _from, wallet) do
-    {:reply, wallet.balance(wallet), wallet}
+  def handle_call(:balance, _from, wallet) do
+    {:reply, Wallet.balance(wallet), wallet}
   end
 
 

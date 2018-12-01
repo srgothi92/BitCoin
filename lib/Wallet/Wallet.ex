@@ -36,7 +36,8 @@ defmodule BITCOIN.Wallet.Wallet do
 
   # finds the balance for particular Wallet from block chain
   def balance(%__MODULE__{} = wallet) do
-    unspentOutputs = Chain.getUnspentOutputsForUser(wallet)
+    unspentOutputs = GenServer.call(:Chain, {:getUnspentOutputsForUser, wallet})
+    #unspentOutputs = Chain.getUnspentOutputsForUser(wallet)
     sumUnspentOutputs(unspentOutputs)
   end
 

@@ -9,9 +9,13 @@ defmodule MockChain do
     Chain.start_link()
     # Start a new Transaction queue to store transaction in buffer untill they are added to blocks
     TransactionQueue.start_link()
-    su = Wallet.createWallet()
-    mu = Wallet.createWallet()
-    lu =  Wallet.createWallet()
+    nodeSu = UserNode.start_link()
+    nodeMu = UserNode.start_link()
+    nodeLu = UserNode.start_link()
+    IO.inspect nodeSu
+    su = GenServer.call(elem(nodeSu,1), :getWallet)
+    mu = GenServer.call(elem(nodeMu,1), :getWallet)
+    lu = GenServer.call(elem(nodeLu,1), :getWallet)
     suTx = Transaction.initialDummyTransaction([TxOutput.createTxOutput(su.address, 50)])
     TransactionQueue.addToQueue(suTx)
     muTx = Transaction.initialDummyTransaction([TxOutput.createTxOutput(mu.address, 20)])
@@ -38,6 +42,6 @@ defmodule MockChain do
      outputs = [TxOutput.createTxOutput(su.address, 3), TxOutput.createTxOutput(lu.address, 1), TxOutput.createTxOutput(mu.address, 4)]
      tx4 = Transaction.createTransaction(mu, inputs, outputs)
      TransactionQueue.addToQueue(tx4)
-     %{su: su, mu: mu, lu: lu}
+     %{nodeSu: nodeSu, nodeMu: nodeMu, nodeLu: nodeLu, su: su, mu: mu, lu: lu}
   end
 end

@@ -55,6 +55,7 @@ defmodule BITCOIN.BlockChain.Chain do
   end
 
   def getUnspentOutputsForUser(%Wallet{} = wallet) do
+    IO.inspect "I am not letting her go"
     GenServer.call(__MODULE__, {:getUnspentOutputsForUser, %Wallet{} = wallet})
   end
 
@@ -80,6 +81,7 @@ defmodule BITCOIN.BlockChain.Chain do
   end
 
   def handle_call({:getUnspentOutputsForUser, %Wallet{} = wallet}, _from, {chain}) do
+    IO.inspect "Su want's to go home"
     mapInputs = createAllInputMap(chain)
     # remove all the outputs which have been consumed as input at some point of time
     userOutputs =

@@ -10,6 +10,8 @@ import MockChain
     {:ok, mockLedger()}
   end
 
-  test "Transaction between two User", %{su: su, mu: mu, lu: lu} do
+  test "Transaction between two User", %{nodeSu: nodeSu, nodeMu: nodeMu, nodeLu: nodeLu} do
+    a = GenServer.call(elem(nodeSu,1), :balance)
+    IO.inspect(a)
   end
 end
