@@ -16,45 +16,37 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
     GenServer.call(__MODULE__, {:addToQueue, tx})
   end
 
-  def handle_cast({:addToQueue, tx}, {queue}) do
-    queue = [queue | tx]
+  def handle_call({:addToQueue, tx}, _from, {queue}) do
+    queue = queue ++ [tx]
     # FIXME: For now adding the block to the chain as soon as transaction is regitered
     # In Part 2, we will let node validate the transaction and do the voting.
-    createBlockAndAdd(queue)
-    {:noreply, {queue}}
+    result = createBlockAndAdd(queue)
+    {:reply, result, {[]}}
   end
 
   defp createBlockAndAdd(queue) do
-    IO.inspect("Su")
-    previousBlock = GenServer.call(:Chain,:getLatestBlock)
-    IO.inspect("Su")
-    block = Block.createBlock(previousBlock.hash, queue)
-    IO.inspect("Su")
+    previousBlock = GenServer.call(:Chain, :getLatestBlock)
+    block = Block.createBlock(previousBlock.index+1, previousBlock.hash, queue)
     {blockHash, nonce} = proofOfWork(block, :rand.uniform(32))
-    IO.inspect("Su")
     block = %{block | hash: blockHash}
-    IO.inspect("Su")
     block = %{block | nonce: nonce}
-    IO.inspect block
-    op = GenServer.call(:Chain,{:addBlock, block})
+    op = GenServer.call(:Chain, {:addBlock, block})
     Logger.info("New Block added #{inspect(op)}")
   end
 
   defp validateProofOfWork(hash) do
-    IO.inspect hash
     target = Application.get_env(:bitcoin, :target)
-    IO.inspect(target)
     String.slice(hash, 0, target) == String.duplicate("0", target)
   end
 
   def proofOfWork(%Block{} = block, nonce \\ 0) do
     block = %{block | nonce: nonce}
-
     blockHash = Block.hash(block)
-      if(!validateProofOfWork(blockHash)) do
-        proofOfWork(block, block.nonce + 1)
-      else
-        {blockHash, nonce}
-      end
+
+    if(!validateProofOfWork(blockHash)) do
+      proofOfWork(block, block.nonce + 1)
+    else
+      {blockHash, nonce}
+    end
   end
 end

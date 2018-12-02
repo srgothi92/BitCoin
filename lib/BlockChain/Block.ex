@@ -43,13 +43,13 @@ defmodule BITCOIN.BlockChain.Block do
     Base.encode16(hashValue)
   end
 
-  def createBlock(previousHash, transactions) do
+  def createBlock(index, previousHash, transactions) do
     %__MODULE__{
       previous_block: previousHash,
       timestamp: :os.system_time(:millisecond),
       nonce: 0,
       transactions: transactions,
-      index: 0,
+      index: index,
       hash: "0"
     }
   end

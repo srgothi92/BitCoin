@@ -15,9 +15,9 @@ defmodule BITCOIN.Wallet.Wallet do
   ]
 
   def createWallet do
-    {publicKey, privateKey} = KeyHandler.keyPairGenerate
+    {publicKey, privateKey} = KeyHandler.keyPairGenerate()
 
-    %__MODULE__ {
+    %__MODULE__{
       address: KeyHandler.publicKeyHash(publicKey),
       public_key: publicKey,
       private_key: privateKey
@@ -37,7 +37,6 @@ defmodule BITCOIN.Wallet.Wallet do
   # finds the balance for particular Wallet from block chain
   def balance(%__MODULE__{} = wallet) do
     unspentOutputs = GenServer.call(:Chain, {:getUnspentOutputsForUser, wallet})
-    #unspentOutputs = Chain.getUnspentOutputsForUser(wallet)
     sumUnspentOutputs(unspentOutputs)
   end
 
@@ -45,15 +44,22 @@ defmodule BITCOIN.Wallet.Wallet do
     Enum.reduce(unspentOutputs, 0, fn {_, _, value}, acc -> acc + value end)
   end
 
+  defp getUnspentOutputFromChain(wallet) do
+    GenServer.call(:Chain, {:getUnspentOutputsForUser, wallet})
+  end
+
   # Creates a transaction to send provided amount to the receipient
   def send(%__MODULE__{} = wallet, amount, recepient) do
-    {:ok, txInputs} = wallet
-    |>Chain.getUnspentOutputsForUser()
-    |> Enum.sort(fn {_, _, value1}, {_, _, value2} -> value1 <= value2 end)
-    |> chooseOutputs(amount, [])
+
+    {:ok, txInputs} =
+      wallet
+      |> getUnspentOutputFromChain
+      |> Enum.sort(fn {_, _, value1}, {_, _, value2} -> value1 <= value2 end)
+      |> chooseOutputs(amount, [])
+
     txInputs = converToInputFormat(txInputs)
     txOutputs = [TxOutput.createTxOutput(recepient, amount)]
-    txOutputs = [ txOutputs | calculateChangeOutputs(wallet, amount, txInputs) ]
+    txOutputs = [txOutputs | calculateChangeOutputs(wallet, amount, txInputs)]
     tx = Transaction.createTransaction(wallet, txInputs, txOutputs)
     TransactionQueue.addToQueue(tx)
   end
@@ -75,11 +81,11 @@ defmodule BITCOIN.Wallet.Wallet do
   end
 
   defp chooseOutputs(_, value, outputs) when value <= 0 do
-        {:ok, outputs}
+    {:ok, outputs}
   end
 
   defp chooseOutputs([], _, _) do
-     {:error, :not_enough_coins}
+    {:error, :not_enough_coins}
   end
 
   defp chooseOutputs([{_, _, v} = output | remaining], value, selectedOutputs) do

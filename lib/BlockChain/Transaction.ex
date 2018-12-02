@@ -23,7 +23,7 @@ defmodule BITCOIN.BlockChain.Transaction do
 
   def initialDummyTransaction(outputs) do
     tx = %__MODULE__{
-      inputs: [TxInput.createTxInput("Abc", 0)],
+      inputs: [],
       outputs: outputs,
       public_key: "",
       sign_tx: ""

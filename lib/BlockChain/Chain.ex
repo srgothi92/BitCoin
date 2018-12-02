@@ -18,8 +18,8 @@ defmodule BITCOIN.BlockChain.Chain do
     String.slice(hash, 0, target) == String.duplicate("0", target)
   end
 
-  @spec validateBlock(Block.t(), Block.t()) :: :ok | {:error, atom()}
-  defp validateBlock(prevBlock, block) do
+  @spec validateBlock(Block.t(), Block.t(), []) :: :ok | {:error, atom()}
+  defp validateBlock(prevBlock, block, chain) do
     cond do
       # check index values
       prevBlock.index != block.index - 1 ->
@@ -38,7 +38,7 @@ defmodule BITCOIN.BlockChain.Chain do
         {:error, :invalid_proof_of_work}
 
       true ->
-        TransactionVerify.validateTransactions(block.transaction, prevBlock)
+        TransactionVerify.validateTransactions(block.transactions, chain)
     end
   end
 
@@ -55,25 +55,24 @@ defmodule BITCOIN.BlockChain.Chain do
   end
 
   def getUnspentOutputsForUser(%Wallet{} = wallet) do
-    IO.inspect "I am not letting her go"
     GenServer.call(__MODULE__, {:getUnspentOutputsForUser, %Wallet{} = wallet})
   end
 
   def handle_call(:getLatestBlock, _from, {chain}) do
     [prevBlock | _] = chain
     prevBlock
-    {:reply, prevBlock,  {chain}}
+    {:reply, prevBlock, {chain}}
   end
 
   def handle_call({:addBlock, %Block{} = block}, _from, {chain}) do
     [prevBlock | _] = chain
 
-    case validateBlock(prevBlock, block) do
+    case validateBlock(prevBlock, block, chain) do
       {:error, reason} ->
-        {:reply, {:error, reason}, chain}
+        {:reply, {:error, reason}, {chain}}
 
       :ok ->
-        {:reply, :ok, {[block, chain]}}
+        {:reply, :ok, {[block] ++ chain}}
     end
   end
 
@@ -82,7 +81,6 @@ defmodule BITCOIN.BlockChain.Chain do
   end
 
   def handle_call({:getUnspentOutputsForUser, %Wallet{} = wallet}, _from, {chain}) do
-    IO.inspect "Su want's to go home"
     mapInputs = createAllInputMap(chain)
     # remove all the outputs which have been consumed as input at some point of time
     userOutputs =
@@ -106,13 +104,18 @@ defmodule BITCOIN.BlockChain.Chain do
   # It will iterate through all the transactions in complete chain and perform taks provided in func
   # on all transactions and returning the accumulated output
   defp txIteratorTask(chain, acc, func) do
-    Enum.reduce_while(chain, acc, fn %{transactions: transactions}, acc ->
-      case transactions do
-        %Transaction{} ->
-          func.(transactions, acc)
-
-        _ ->
-          {:cont, acc}
+    Enum.reduce_while(chain, acc, fn block, acc ->
+      if(block.transactions == []) do
+        {:cont, acc}
+      else
+        # Single block has only single transaction
+        transactions = Enum.at(block.transactions, 0)
+        case transactions do
+          %Transaction{} ->
+            func.(transactions, acc)
+          _ ->
+            {:cont, acc}
+        end
       end
     end)
   end
