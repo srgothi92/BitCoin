@@ -30,7 +30,7 @@ alias BITCOIN.Wallet.Wallet
     GenServer.call(elem(nodeSu,1),{:send, 6,  GenServer.call(elem(nodeMu,1), :getWallet).address})
     suBalance =  GenServer.call(elem(nodeSu,1),:balance)
     muBalance =  GenServer.call(elem(nodeMu,1),:balance)
-    assert muBalance == 28
+    assert muBalance == 34
     assert suBalance == 30
   end
 end

@@ -56,12 +56,11 @@ defmodule BITCOIN.Wallet.Wallet do
       |> getUnspentOutputFromChain
       |> Enum.sort(fn {_, _, value1}, {_, _, value2} -> value1 <= value2 end)
       |> chooseOutputs(amount, [])
-
-    txInputs = converToInputFormat(txInputs)
     txOutputs = [TxOutput.createTxOutput(recepient, amount)]
-    txOutputs = [txOutputs | calculateChangeOutputs(wallet, amount, txInputs)]
+    txOutputs = txOutputs ++ calculateChangeOutputs(wallet, amount, txInputs)
+    txInputs = converToInputFormat(txInputs)
     tx = Transaction.createTransaction(wallet, txInputs, txOutputs)
-    TransactionQueue.addToQueue(tx)
+    GenServer.call(:TransactionQueue, {:addToQueue,tx})
   end
 
   defp calculateChangeOutputs(%__MODULE__{} = wallet, amount, txInputs) do
