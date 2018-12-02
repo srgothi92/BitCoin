@@ -60,7 +60,7 @@ defmodule BITCOIN.Wallet.Wallet do
     txOutputs = txOutputs ++ calculateChangeOutputs(wallet, amount, txInputs)
     txInputs = converToInputFormat(txInputs)
     tx = Transaction.createTransaction(wallet, txInputs, txOutputs)
-    GenServer.call(:TransactionQueue, {:addToQueue,tx})
+    GenServer.call(:TransactionQueue, {:addToQueue, [tx]})
   end
 
   defp calculateChangeOutputs(%__MODULE__{} = wallet, amount, txInputs) do

@@ -12,12 +12,12 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
     {:ok, {queue}}
   end
 
-  def addToQueue(%Transaction{} = tx) do
-    GenServer.call(__MODULE__, {:addToQueue, tx})
+  def addToQueue(%Transaction{} = txs) do
+    GenServer.call(__MODULE__, {:addToQueue, txs})
   end
 
-  def handle_call({:addToQueue, tx}, _from, {queue}) do
-    queue = queue ++ [tx]
+  def handle_call({:addToQueue, txs}, _from, {queue}) do
+    queue = queue ++ txs
     # FIXME: For now adding the block to the chain as soon as transaction is regitered
     # In Part 2, we will let node validate the transaction and do the voting.
     result = createBlockAndAdd(queue)
@@ -32,6 +32,7 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
     block = %{block | nonce: nonce}
     op = GenServer.call(:Chain, {:addBlock, block})
     Logger.info("New Block added #{inspect(op)}")
+    op
   end
 
   defp validateProofOfWork(hash) do

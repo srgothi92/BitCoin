@@ -3,19 +3,12 @@ defmodule BITCOIN.BlockChain.TransactionVerify do
   alias BITCOIN.Wallet.{KeyHandler}
 
   def validateTransactions([] = currentTxs, chain) do
-    :ok
+    {:error, :empty_transaction}
   end
 
   @spec validateTransactions([Transaction], [Transaction]) :: :ok | {:error, atom}
   def validateTransactions(currentTxs, chain) do
-    # For now there is only one transaction in a block
-    cond do
-      currentTxs == [] ->
-        {:error, :emptyBlock}
-
-      true ->
-        validateTransaction(Enum.at(currentTxs, 0), currentTxs, chain)
-    end
+    validateTransaction(Enum.at(currentTxs, 0), currentTxs, chain)
 
     # if(validationOp != :ok) do
     #   validationOp
@@ -57,19 +50,19 @@ defmodule BITCOIN.BlockChain.TransactionVerify do
 
   defp checkInputsDuplicated?([currentTx | remainingTxs], inputMap) do
     # Enum.any evaluates to true when any input value repeats so we have negate the value
-    bInputDuplicated =
-      !Enum.any?(currentTx.inputs, fn input ->
+    inputMap =
+      Enum.reduce_while(currentTx.inputs, inputMap, fn input, acc ->
         cond do
-          Map.has_key?(inputMap, input.previous_op_tx_hash) && Map.get(inputMap, input.previous_op_tx_hash) == input.index ->
-            IO.inspect Map.has_key?(inputMap, input.previous_op_tx_hash)
-            true
+          Map.has_key?(acc, input.previous_op_tx_hash) &&
+              Map.get(acc, input.previous_op_tx_hash) == input.index ->
+            {:halt, Map.put(acc, input.previous_op_tx_hash, input.index)}
 
           true ->
-            inputMap = Map.put(inputMap, input.previous_op_tx_hash, input.index)
+            {:cont, Map.put(acc, input.previous_op_tx_hash, input.index)}
         end
       end)
 
-    if(bInputDuplicated == true) do
+    if(map_size(inputMap) != length(currentTx.inputs)) do
       false
     else
       # validate with rest of the list
@@ -148,19 +141,17 @@ defmodule BITCOIN.BlockChain.TransactionVerify do
     address = KeyHandler.publicKeyHash(tx.public_key)
     message = Transaction.serializeTx(tx)
     bSignature = KeyHandler.verifySignature(tx.public_key, tx.sign_tx, message)
-
     if !bSignature do
-      {:error, :invalid_tx_signature}
+      false
+    else
+      !Enum.any?(tx.inputs, fn input ->
+        # check owership of each input is same as person authorizing the transaction
+        prevTx = findPreviousTx(input, chain)
+        prevOutput = Enum.at(prevTx.outputs, input.index)
+        if(prevOutput.wallet_address != address) do
+          true
+        end
+      end)
     end
-
-    !Enum.any?(tx.inputs, fn input ->
-      # check owership of each input is same as person authorizing the transaction
-      prevTx = findPreviousTx(input, chain)
-      prevOutput = Enum.at(prevTx.outputs, input.index)
-
-      if(prevOutput.wallet_address != address) do
-        false
-      end
-    end)
   end
 end
