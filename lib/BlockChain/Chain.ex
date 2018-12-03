@@ -3,16 +3,27 @@ defmodule BITCOIN.BlockChain.Chain do
 
   alias BITCOIN.BlockChain.{Block, Transaction, TransactionVerify}
   alias BITCOIN.Wallet.Wallet
-
+  @moduledoc """
+  Validates proof of work and is responsible for managing the chain.
+  """
+  @doc """
+  Starts the GenServer.
+  """
   def start_link() do
     GenServer.start_link(__MODULE__, {}, name: :Chain)
   end
 
+  @doc """
+  Initiates the state of the GenServer.
+  """
   def init(_) do
     chain = [Block.initialBlock()]
     {:ok, {chain}}
   end
 
+  @doc """
+  Validates the proof of work
+  """
   def validateProofOfWork(hash) do
     target = Application.get_env(:bitcoin, :target)
     String.slice(hash, 0, target) == String.duplicate("0", target)
@@ -42,28 +53,48 @@ defmodule BITCOIN.BlockChain.Chain do
     end
   end
 
+  @doc """
+  Returns the latest block in the chain.
+  """
   def getLatestBlock() do
     GenServer.call(__MODULE__, :getLatestBlock)
   end
 
+  @doc """
+  Adds the block to the chain.
+  """
   def addBlock(%Block{} = block) do
     GenServer.call(__MODULE__, {:addBlock, block})
   end
 
+  @doc """
+  Returns all the blocks present in the chain.
+  """
   def getAllBlocks(%Block{}) do
     GenServer.call(__MODULE__, :getAllBlocks)
   end
 
+  @doc """
+  Returns the amount remaining with a user.
+  """
   def getUnspentOutputsForUser(%Wallet{} = wallet) do
     GenServer.call(__MODULE__, {:getUnspentOutputsForUser, %Wallet{} = wallet})
   end
 
+  @doc """
+  Returns the latest block in the chain.
+  """
   def handle_call(:getLatestBlock, _from, {chain}) do
     [prevBlock | _] = chain
     prevBlock
     {:reply, prevBlock, {chain}}
   end
 
+  @doc """
+  Checks whether the block is correct or not
+  Returns an error if the chain is not valid
+  Returns the chain containing the added block if it is valid.
+  """
   def handle_call({:addBlock, %Block{} = block}, _from, {chain}) do
     [prevBlock | _] = chain
 
@@ -76,10 +107,16 @@ defmodule BITCOIN.BlockChain.Chain do
     end
   end
 
+  @doc """
+  Returns the chain containing all the blocks.
+  """
   def handle_call(:getAllBlocks, _from, {chain}) do
     {:reply, chain, {chain}}
   end
 
+  @doc """
+  Returns the amount remaining with a user.
+  """
   def handle_call({:getUnspentOutputsForUser, %Wallet{} = wallet}, _from, {chain}) do
     mapInputs = createAllInputMap(chain)
     # remove all the outputs which have been consumed as input at some point of time

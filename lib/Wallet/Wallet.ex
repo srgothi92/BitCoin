@@ -1,7 +1,9 @@
 defmodule BITCOIN.Wallet.Wallet do
   alias BITCOIN.Wallet.KeyHandler
   alias BITCOIN.BlockChain.{Chain, TxOutput, Transaction, TxInput, TransactionQueue}
-
+  @moduledoc """
+  Manages the wallet for different user nodes.
+  """
   @type t :: %__MODULE__{
           address: String.t(),
           public_key: String.t(),
@@ -14,6 +16,9 @@ defmodule BITCOIN.Wallet.Wallet do
     :private_key
   ]
 
+  @doc """
+  Creates a wallet.
+  """
   def createWallet do
     {publicKey, privateKey} = KeyHandler.keyPairGenerate()
 
@@ -24,16 +29,25 @@ defmodule BITCOIN.Wallet.Wallet do
     }
   end
 
+  @doc """
+  Signs the transaction for authenticity.
+  """
   # sign the transaction
   def sign(msg, %__MODULE__{private_key: pvKey}) do
     KeyHandler.signMessage(pvKey, msg)
   end
 
+  @doc """
+  Verifies the signature on transaction
+  """
   # Verify the signature on trnsaction
   def verify(%__MODULE__{public_key: pubKey}, signedMsg, message) do
     KeyHandler.verifySignature(pubKey, signedMsg, message)
   end
 
+  @doc """
+  Calculates the balance for a given wallet.
+  """
   # finds the balance for particular Wallet from block chain
   def balance(%__MODULE__{} = wallet) do
     unspentOutputs = GenServer.call(:Chain, {:getUnspentOutputsForUser, wallet})
@@ -48,6 +62,9 @@ defmodule BITCOIN.Wallet.Wallet do
     GenServer.call(:Chain, {:getUnspentOutputsForUser, wallet})
   end
 
+  @doc """
+  Creates a transaction to send provided amount to the receipient
+  """
   # Creates a transaction to send provided amount to the receipient
   def send(%__MODULE__{} = wallet, amount, recepient) do
 

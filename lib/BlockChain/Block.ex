@@ -1,4 +1,8 @@
 defmodule BITCOIN.BlockChain.Block do
+  @moduledoc """
+  Creates blocks and calculates their hash values
+  """
+
   # The hash value of the previous block this particular block references
   defstruct [
     :previous_block,
@@ -20,6 +24,9 @@ defmodule BITCOIN.BlockChain.Block do
           hash: String
         }
 
+  @doc """
+  Creates the initial block with the given values.
+  """
   def initialBlock() do
     %__MODULE__{
       previous_block: "0",
@@ -37,12 +44,18 @@ defmodule BITCOIN.BlockChain.Block do
       Integer.to_string(block.nonce) <> Integer.to_string(block.index)
   end
 
+  @doc """
+  Calculates the hash value of the block.
+  """
   def hash(%__MODULE__{} = block) do
     headerString = stringifyHeader(block)
     hashValue = :crypto.hash(:sha256, :crypto.hash(:sha256, headerString))
     Base.encode16(hashValue)
   end
 
+  @doc """
+  Creates the blocks by taking the previous block's hash as input.
+  """
   def createBlock(index, previousHash, transactions) do
     %__MODULE__{
       previous_block: previousHash,

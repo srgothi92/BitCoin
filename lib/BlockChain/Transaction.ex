@@ -1,6 +1,10 @@
 defmodule BITCOIN.BlockChain.Transaction do
   alias BITCOIN.Wallet.{Wallet, KeyHandler}
   alias BITCOIN.BlockChain.{TxInput, TxOutput}
+  @moduledoc """
+  Creates transactions and calculates their hash valuess.
+  """
+
   defstruct [
     :sign_tx,
     # public key of user who authorized this transaction
@@ -21,6 +25,9 @@ defmodule BITCOIN.BlockChain.Transaction do
           outputs: list(TxOutput.t())
         }
 
+  @doc """
+  Creates a transaction with given values.
+  """
   def initialDummyTransaction(outputs) do
     tx = %__MODULE__{
       inputs: [],
@@ -31,6 +38,9 @@ defmodule BITCOIN.BlockChain.Transaction do
     %{tx | hash: hash(tx)}
   end
 
+  @doc """
+  Creates a transaction for a specified wallet with the given input and output
+  """
   def createTransaction(%Wallet{} = wallet, inputs, outputs) do
     tx = %__MODULE__{
       hash: wallet.address,
@@ -43,6 +53,9 @@ defmodule BITCOIN.BlockChain.Transaction do
     %{signedTx | hash: hash(signedTx)}
   end
 
+  @doc """
+  Converts the transaction into string.
+  """
   def serializeTx(%__MODULE__{} = tx) do
     inputSerialized = Enum.reduce(tx.inputs, "", fn input, acc ->
       acc <> input.previous_op_tx_hash <> Integer.to_string(input.index)
@@ -53,6 +66,9 @@ defmodule BITCOIN.BlockChain.Transaction do
     inputSerialized <> outputSerialized <> tx.public_key
   end
 
+  @doc """
+  Calculates the hash of a given transaction.
+  """
   def hash(tx) do
     KeyHandler.hash(serializeTx(tx) <> tx.sign_tx)
   end

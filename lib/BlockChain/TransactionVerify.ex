@@ -1,11 +1,19 @@
 defmodule BITCOIN.BlockChain.TransactionVerify do
   alias BITCOIN.BlockChain.{Transaction, TxInput}
   alias BITCOIN.Wallet.{KeyHandler}
-
+  @moduledoc """
+  Validates transactions.
+  """
+  @doc """
+  Validates transaction and returns an error if its an empty transaction
+  """
   def validateTransactions([] = currentTxs, chain) do
     {:error, :empty_transaction}
   end
 
+  @doc """
+  Validates transaction
+  """
   @spec validateTransactions([Transaction], [Transaction]) :: :ok | {:error, atom}
   def validateTransactions(currentTxs, chain) do
     validateTransaction(Enum.at(currentTxs, 0), currentTxs, chain)
@@ -17,6 +25,9 @@ defmodule BITCOIN.BlockChain.TransactionVerify do
     # end
   end
 
+  @doc """
+  Validates transaction by checking various conditions
+  """
   @spec validateTransaction(Transaction, [Transaction], [Transaction]) :: :ok | {:error, atom}
   def validateTransaction(%Transaction{} = tx, currentTxs, chain) do
     cond do

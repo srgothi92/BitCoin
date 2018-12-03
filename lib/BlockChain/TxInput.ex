@@ -1,4 +1,7 @@
 defmodule BITCOIN.BlockChain.TxInput do
+  @moduledoc """
+  Manages the input for a block
+  """
   defstruct [
     # Hash value of transacation in previous block
     :previous_op_tx_hash,
@@ -11,6 +14,9 @@ defmodule BITCOIN.BlockChain.TxInput do
           index: integer
         }
 
+  @doc """
+  Creates the input for a block.
+  """
   def createTxInput(hash, index) do
     %__MODULE__{
       previous_op_tx_hash: hash,

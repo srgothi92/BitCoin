@@ -1,4 +1,7 @@
 defmodule BITCOIN.BlockChain.TxOutput do
+  @moduledoc """
+  Manages the output for a block
+  """
   # Transaction Value (in satoshis)
   defstruct [
     :value,
@@ -11,6 +14,9 @@ defmodule BITCOIN.BlockChain.TxOutput do
           wallet_address: String.t()
         }
 
+  @doc """
+  Creates the output for a block.
+  """
   def createTxOutput(address, amount) do
     %__MODULE__{
       value: amount,
