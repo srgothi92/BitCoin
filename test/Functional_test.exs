@@ -39,7 +39,7 @@ defmodule BITCOIN.BlockChain.Functional_test do
   end
 
   test "Transaction vlaidation for empty transaction" do
-    result = GenServer.call(:TransactionQueue, {:addToQueue, []})
+    result = GenServer.call(:TransactionQueue, {:addToChain, []})
     assert result == {:error, :empty_transaction}
   end
 
@@ -53,7 +53,7 @@ defmodule BITCOIN.BlockChain.Functional_test do
     ]
 
     tx1 = Transaction.createTransaction(su, inputs, outputs)
-    result = GenServer.call(:TransactionQueue, {:addToQueue, [tx1]})
+    result = GenServer.call(:TransactionQueue, {:addToChain, [tx1]})
     assert result == {:error, :some_inputs_does_not_exist}
   end
 
@@ -67,7 +67,7 @@ defmodule BITCOIN.BlockChain.Functional_test do
     ]
 
     tx1 = Transaction.createTransaction(su, inputs, outputs)
-    result = GenServer.call(:TransactionQueue, {:addToQueue, [tx1]})
+    result = GenServer.call(:TransactionQueue, {:addToChain, [tx1]})
     assert result == {:error, :invalid_input_minus_output_sum}
   end
 
@@ -79,7 +79,7 @@ defmodule BITCOIN.BlockChain.Functional_test do
     ]
 
     tx1 = Transaction.createTransaction(su, inputs, outputs)
-    result = GenServer.call(:TransactionQueue, {:addToQueue, [tx1]})
+    result = GenServer.call(:TransactionQueue, {:addToChain, [tx1]})
     assert result == {:error, :invalid_inputs_uniqueness}
   end
 
@@ -91,7 +91,7 @@ defmodule BITCOIN.BlockChain.Functional_test do
     ]
 
     tx1 = Transaction.createTransaction(lu, inputs, outputs)
-    result = GenServer.call(:TransactionQueue, {:addToQueue, [tx1]})
+    result = GenServer.call(:TransactionQueue, {:addToChain, [tx1]})
     assert result =={:error, :invalid_input_ownership}
   end
 

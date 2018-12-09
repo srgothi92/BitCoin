@@ -1,6 +1,8 @@
 defmodule BITCOIN.Wallet.Wallet do
+  require Logger
   alias BITCOIN.Wallet.KeyHandler
-  alias BITCOIN.BlockChain.{Chain, TxOutput, Transaction, TxInput, TransactionQueue}
+  alias BITCOIN.BlockChain.{TxOutput, Transaction, TxInput}
+
   @moduledoc """
   Manages the wallet for different user nodes.
   """
@@ -62,22 +64,47 @@ defmodule BITCOIN.Wallet.Wallet do
     GenServer.call(:Chain, {:getUnspentOutputsForUser, wallet})
   end
 
+  defp createTransaction(wallet, amount, recepient) do
+    result =
+      wallet
+      |> getUnspentOutputFromChain
+      |> Enum.sort(fn {_, _, value1}, {_, _, value2} -> value1 <= value2 end)
+      |> chooseOutputs(amount, [])
+
+    case result do
+      {:ok, txInputs} ->
+        txOutputs = [TxOutput.createTxOutput(recepient, amount)]
+        txOutputs = txOutputs ++ calculateChangeOutputs(wallet, amount, txInputs)
+        txInputs = converToInputFormat(txInputs)
+        tx = Transaction.createTransaction(wallet, txInputs, txOutputs)
+        tx
+
+      {:error, _} ->
+        nil
+    end
+  end
+
   @doc """
   Creates a transaction to send provided amount to the receipient
   """
   # Creates a transaction to send provided amount to the receipient
   def send(%__MODULE__{} = wallet, amount, recepient) do
+    tx = createTransaction(wallet, amount, recepient)
 
-    {:ok, txInputs} =
-      wallet
-      |> getUnspentOutputFromChain
-      |> Enum.sort(fn {_, _, value1}, {_, _, value2} -> value1 <= value2 end)
-      |> chooseOutputs(amount, [])
-    txOutputs = [TxOutput.createTxOutput(recepient, amount)]
-    txOutputs = txOutputs ++ calculateChangeOutputs(wallet, amount, txInputs)
-    txInputs = converToInputFormat(txInputs)
-    tx = Transaction.createTransaction(wallet, txInputs, txOutputs)
-    GenServer.call(:TransactionQueue, {:addToQueue, [tx]})
+    if(tx != nil) do
+      GenServer.call(:TransactionQueue, {:addToChain, [tx]})
+    end
+  end
+
+  def transact(%__MODULE__{} = wallet, amount, recepient) do
+    Logger.info("Requested a transaction worth amount #{inspect(amount)}")
+    tx = createTransaction(wallet, amount, recepient)
+    if(tx != nil) do
+      Logger.info("Created transaction")
+      GenServer.cast(:Server, {:broadcastTx, [tx]})
+    else
+      Logger.info("Transaction not created, :not_enough_coins")
+    end
   end
 
   defp calculateChangeOutputs(%__MODULE__{} = wallet, amount, txInputs) do

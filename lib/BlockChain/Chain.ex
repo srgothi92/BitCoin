@@ -30,7 +30,7 @@ defmodule BITCOIN.BlockChain.Chain do
   end
 
   @spec validateBlock(Block.t(), Block.t(), []) :: :ok | {:error, atom()}
-  defp validateBlock(prevBlock, block, chain) do
+  def validateBlock(prevBlock, block, chain) do
     cond do
       # check index values
       prevBlock.index != block.index - 1 ->
@@ -86,7 +86,6 @@ defmodule BITCOIN.BlockChain.Chain do
   """
   def handle_call(:getLatestBlock, _from, {chain}) do
     [prevBlock | _] = chain
-    prevBlock
     {:reply, prevBlock, {chain}}
   end
 
