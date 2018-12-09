@@ -3,11 +3,13 @@
   No of nodes:&nbsp;&nbsp;&nbsp;&nbsp;
   <input type="text" name="noOfNodes"><br>
 </form>
+<div class="rect" align = "left"><h2>First rectangle</h2>
 <div class="gridly">
-  <div class="brick small" align = "left">
+<br><br><br><br><br><br><br><br><br><br><br><br>
+  <div class="line chart" align = "left">
   <canvas id="lineChart" width="6000" height="4000"  align = "left"></canvas>
   </div>
-  <div class="brick large" align = "left">
+  <div class="bar chart" align = "left">
   <canvas id="barChart" width="6000" height="4000"  align = "left"></canvas>
   </div>
 </div>
