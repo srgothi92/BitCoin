@@ -1,0 +1,23 @@
+  .gridly {
+    position: relative;
+    height: 200px;
+    width: 50%;
+    
+  }
+  .brick.small {
+    height: 400px;
+    width: 600px;
+    background-color: lightcyan;
+    position:absolute;
+    left: 50;
+    transform:translateX(-50%);
+  }
+  .brick.large {
+    height: 400px;
+    width: 600px;
+    background-color: lightcyan;
+    position:absolute;
+    left:30;
+    transform:translateX(60%);
+  }
+

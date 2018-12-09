@@ -1,0 +1,13 @@
+<script> require("js/dashboard.js"); </script>
+<form>
+  No of nodes:&nbsp;&nbsp;&nbsp;&nbsp;
+  <input type="text" name="noOfNodes"><br>
+</form>
+<div class="gridly">
+  <div class="brick small" align = "left">
+  <canvas id="lineChart" width="6000" height="4000"  align = "left"></canvas>
+  </div>
+  <div class="brick large" align = "left">
+  <canvas id="barChart" width="6000" height="4000"  align = "left"></canvas>
+  </div>
+</div>

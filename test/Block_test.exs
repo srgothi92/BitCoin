@@ -13,7 +13,7 @@ defmodule BITCOIN.BlockChain.Block_test do
   test "verify Block hash size" do
     previousHash = "su is stupid"
     transactions = []
-    newBlock = Block.createBlock(0,previousHash, transactions)
+    newBlock = Block.createBlock(0, previousHash, transactions)
     hashValue = Block.hash(newBlock)
     assert byte_size(hashValue) == 64
   end
