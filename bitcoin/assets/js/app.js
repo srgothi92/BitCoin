@@ -14,6 +14,7 @@
 import "phoenix_html"
 import "chart.js"
 import "jquery.gridly"
+import "chartjs-plugin-zoom"
 // Import local files
 //
 // Local files can be imported directly using relative

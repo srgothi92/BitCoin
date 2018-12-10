@@ -8,6 +8,7 @@
   "dependencies": {
     "bower": "^1.8.4",
     "chart.js": "^2.7.2",
+    "chartjs-plugin-zoom": "^0.6.6",
     "gridster": "0.5.6",
     "jquery": ">= 2.1",
     "phoenix": "file:../deps/phoenix",

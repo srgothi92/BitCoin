@@ -4,57 +4,66 @@
     columns: 12
   });
   $(function() {
-  var ctx1 = document.getElementById("lineChart").getContext('2d');
-  var myChart1 = new Chart(ctx1, {
-   type: 'line',
-    data: {
-       labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-     datasets: [
-       {
-        label: "Total Bitcoins mined",
-        backgroundColor: "rgba(155, 89, 182,0.2)",
-        borderColor: "rgba(142, 68, 173,1.0)",
-        pointBackgroundColor: "rgba(142, 68, 173,1.0)",
-        data: [2.3,2.5,2.7,3.3,4.3,5.3,2.3,2.7,2.8,2.3,3.3,5.3]
-       }
-      ]
-    },
-    options: {
-     scales: {
-      yAxes: [{
-       ticks: {
-        beginAtZero:true
-       }
-      }]
-     }
-    }
-  })
+    var ctx = document.getElementById("lineChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: '# of Votes',
+                backgroundColor: "rgba(155, 89, 182,0.2)",
+                borderColor: "rgba(142, 68, 173,1.0)",
+                pointBackgroundColor: "rgba(142, 68, 173,1.0)",
+                data: [12, 19, 3, 5, 2, 3]
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            },
+            pan: {
+                enabled: true,
+                mode: 'xy'
+            },
+            zoom: {
+                enabled: true,
+                mode: 'xy',
+            }
+        }
+    })
 });
 $(function() {
-  var ctx2 = document.getElementById("barChart").getContext('2d');
-  var myChart2 = new Chart(ctx2, {
-   type: 'line',
+  var ctx1 = document.getElementById("barChart");
+  var myChart1 = new Chart(ctx1, {
+    type: 'bar',
     data: {
-       labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-     datasets: [
-       {
-        label: "Total Bitcoins mined",
-        backgroundColor: "rgba(155, 89, 182,0.2)",
-        borderColor: "rgba(142, 68, 173,1.0)",
-        pointBackgroundColor: "rgba(142, 68, 173,1.0)",
-        data: [2.3,2.5,2.7,3.3,4.3,5.3,2.3,2.7,2.8,2.3,3.3,5.3]
-       }
+      labels: ["Africa", "Asia", "Europe", "Latin America", "North America"],
+      datasets: [
+        {
+          label: "Population (millions)",
+          backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+          data: [2478,5267,734,784,433]
+        }
       ]
     },
     options: {
-     scales: {
-      yAxes: [{
-       ticks: {
-        beginAtZero:true
-       }
-      }]
-     }
-    }
+      legend: { display: false },
+      title: {
+        display: true,
+        text: 'Predicted world population (millions) in 2050'
+      },
+    pan: {
+      enabled: true,
+      mode: 'xy'
+  },
+  zoom: {
+      enabled: true,
+      mode: 'xy',
+  }
+}
   })
 });
-
