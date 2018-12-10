@@ -1,34 +1,50 @@
 <script> require("js/dashboard.js"); 
+   function getTotalAmount(balances) {
+     total = 0;
+     for(var balance in balances) {
+       total = total + balances[balance];
+     }
+     return total;
+   }
 
    function getAllBalance(){
-    $.get("/getAllBalance", function(data){
-      console.log(data)
+    $.get("/getAllBalance", function(balances){
+      var total = getTotalAmount(JSON.parse(balances));
+      console.log(total)
+      $(".rect4Number").html(total);
     })
    }
 
    function startSimulation() {
-    $.get("/startSimulation", function(data){
+     numberOfNodes = $(".num_nodes_input").val();
+     numberOfNodes = numberOfNodes != "" ? numberOfNodes : 10;
+     $(".rect1Number").html(numberOfNodes);
+    $.get("/startSimulation\?numofNodes=" + numberOfNodes, function(data){
       console.log(data)
+      $(".start_simulation").attr("disabled", "disabled");
       getAllBalance()
     })
    }
 
    function stopSimulation() {
     $.get("/stopSimulation", function(data){
-      console.log(data)
+      console.log(data)      
+      $(".start_simulation").attr("enabled", "enabled");
     })
+
+    window.setInterval(getAllBalance(), 2000)
    }</script>
 <form style = "margin-left:150px">
   No of nodes:&nbsp;&nbsp;&nbsp;&nbsp;
-  <input type="text" name="noOfNodes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <button type="button" onclick="startSimulation()">Start</button>&nbsp;&nbsp;&nbsp;
+  <input class= "num_nodes_input"type="text" name="noOfNodes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <button class="start_simulation" type="button" onclick="startSimulation()">Start</button>&nbsp;&nbsp;&nbsp;
   <button type="button" onclick="stopSimulation()">Stop</button> <br><br>
 </form>
 
-<div class="rect1" align = "left"><h2>&nbsp;&nbsp;First rectangle</h2></div>
+<div class="rect1" align = "left"><h2 class="rect1Number">0</h2><h2>&nbsp;&nbsp;First rectangle</h2></div>
 <div class="rect2" align = "left"><h2>&nbsp;&nbsp;Second rectangle</h2></div>
 <div class="rect3" align = "left"><h2>&nbsp;&nbsp;Third rectangle</h2></div>
-<div class="rect4" align = "left"><h2>&nbsp;&nbsp;Fourth rectangle</h2></div><br>
+<div class="rect4" align = "left"><h2 class="rect4Number">0</h2><h2>&nbsp;&nbsp;Fourth rectangle</h2></div><br>
 <br><br><br><br><br><br><br><br><br><br><br><br>
   <div class="line chart" align = "left">
   <canvas id="lineChart" width="6000" height="4000"  align = "left"></canvas>
