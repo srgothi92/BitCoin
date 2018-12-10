@@ -1,3 +1,4 @@
+
   .gridly {
     position: relative;
     height: 200px;
@@ -8,7 +9,7 @@
     height: 400px;
     width: 600px;
     background-color: lightcyan;
-    position:fixed;
+    position:absolute;
     left: 50;
     transform:translateX(-50%);
   }
@@ -16,15 +17,39 @@
     height: 400px;
     width: 600px;
     background-color: lightcyan;
-    position:fixed;
+    position:absolute;
     left:30;
     transform:translateX(60%);
   }
-  .rect {
+  .rect1 {
     height: 200px;
-    width: 300px;
+    width: 280px;
     background-color: lightcyan;
     position:absolute;
-    left:30;
-    transform:translateX(-60%);
+    
+    transform:translateX(-100%);
+  }
+  .rect2 {
+    height: 200px;
+    width: 280px;
+    background-color: lightcyan;
+    position:absolute;
+    
+    transform:translateX(15%);
+  }
+  .rect3 {
+    height: 200px;
+    width: 280px;
+    background-color: lightcyan;
+    position:absolute;
+    
+    transform:translateX(130%);
+  }
+  .rect4 {
+    height: 200px;
+    width: 280px;
+    background-color: lightcyan;
+    position:absolute;
+    
+    transform:translateX(240%);
   }

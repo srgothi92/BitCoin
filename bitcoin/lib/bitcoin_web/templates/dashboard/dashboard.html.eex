@@ -1,15 +1,19 @@
 <script> require("js/dashboard.js"); </script>
-<form>
+<form style = "margin-left:150px">
   No of nodes:&nbsp;&nbsp;&nbsp;&nbsp;
-  <input type="text" name="noOfNodes"><br>
+  <input type="text" name="noOfNodes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <button type="button">Start</button>&nbsp;&nbsp;&nbsp;
+  <button type="button">Stop</button> <br><br>
 </form>
-<div class="rect" align = "left"><h2>First rectangle</h2>
-<div class="gridly">
+
+<div class="rect1" align = "left"><h2>&nbsp;&nbsp;First rectangle</h2></div>
+<div class="rect2" align = "left"><h2>&nbsp;&nbsp;Second rectangle</h2></div>
+<div class="rect3" align = "left"><h2>&nbsp;&nbsp;Third rectangle</h2></div>
+<div class="rect4" align = "left"><h2>&nbsp;&nbsp;Fourth rectangle</h2></div><br>
 <br><br><br><br><br><br><br><br><br><br><br><br>
   <div class="line chart" align = "left">
   <canvas id="lineChart" width="6000" height="4000"  align = "left"></canvas>
   </div>
   <div class="bar chart" align = "left">
   <canvas id="barChart" width="6000" height="4000"  align = "left"></canvas>
-  </div>
 </div>
