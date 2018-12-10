@@ -102,4 +102,11 @@ defmodule BITCOIN.Server do
     balances = getAllBalances(nodes)
     {:reply, balances, {nodes, nodesValidated}}
   end
+
+  def handle_call(:stopAllNodes, _from, {nodes, nodesValidated}) do
+    Enum.each(nodes, fn nodePid ->
+      Process.exit(nodePid, :normal)
+    end)
+    {:reply, :ok,  {nodes, nodesValidated}}
+  end
 end

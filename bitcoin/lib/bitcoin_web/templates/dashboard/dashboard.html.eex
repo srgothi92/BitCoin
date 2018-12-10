@@ -1,9 +1,28 @@
-<script> require("js/dashboard.js"); </script>
+<script> require("js/dashboard.js"); 
+
+   function getAllBalance(){
+    $.get("/getAllBalance", function(data){
+      console.log(data)
+    })
+   }
+
+   function startSimulation() {
+    $.get("/startSimulation", function(data){
+      console.log(data)
+      getAllBalance()
+    })
+   }
+
+   function stopSimulation() {
+    $.get("/stopSimulation", function(data){
+      console.log(data)
+    })
+   }</script>
 <form style = "margin-left:150px">
   No of nodes:&nbsp;&nbsp;&nbsp;&nbsp;
   <input type="text" name="noOfNodes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <button type="button">Start</button>&nbsp;&nbsp;&nbsp;
-  <button type="button">Stop</button> <br><br>
+  <button type="button" onclick="startSimulation()">Start</button>&nbsp;&nbsp;&nbsp;
+  <button type="button" onclick="stopSimulation()">Stop</button> <br><br>
 </form>
 
 <div class="rect1" align = "left"><h2>&nbsp;&nbsp;First rectangle</h2></div>

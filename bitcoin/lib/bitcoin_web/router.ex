@@ -18,6 +18,11 @@ defmodule BitcoinWeb.Router do
 
     get "/", PageController, :index
     get "/su", DashboardController, :dashboard
+    get "/getAllBalance", DashboardController, :getAllBalance
+    get "/getTransactionCount", DashboardController, :getTransactionCount
+    get "/getBlockCount", DashboardController, :getBlockCount
+    get "/startSimulation", DashboardController, :startSimulation
+    get "/stopSimulation", DashboardController, :stopSimulation
   end
 
   # Other scopes may use custom stacks.
