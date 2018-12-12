@@ -53,6 +53,47 @@ $(function () {
 	myLineChart = new Chart(ctx, lineConfig)
 });
 
+$(function() {
+  var ctx1 = document.getElementById("barChart");
+  barConfig = {
+    type: 'bar',
+    data: {
+			datasets: [{
+				label: 'balance',
+				backgroundColor: "rgba(155, 89, 182,0.2)",
+				borderColor: "rgba(142, 68, 173,1.0)",
+				pointBackgroundColor: "rgba(142, 68, 173,1.0)",
+				data: []
+			}]
+		},
+    options: {
+      scales: {
+				xAxes: [{
+					display: true,
+					scaleLabel: {
+						ticks: {
+							beginAtZero: true
+						},
+						display: true,
+						labelString: 'num of nodes'
+					}
+				}],
+				yAxes: [{
+					display: true,
+					scaleLabel: {
+						ticks: {
+							beginAtZero: true
+						},
+						display: true,
+						labelString: 'value'
+					}
+				}]
+			}
+		}
+  }
+		mybarChart = new Chart(ctx1, barConfig)
+  });
+
 function getTotalAmount(balances) {
 	total = 0;
 	for (var balance in balances) {
@@ -65,7 +106,13 @@ function getAllBalance() {
 	$.get("/getAllBalance", function (balances) {
 		var total = getTotalAmount(JSON.parse(balances));
 		console.log(total)
+		$(".rect1Number").html(numberOfNodes);
 		$(".rect4Number").html(total);
+		window.barConfig.data.datasets[0].data.push({
+			x: numberOfNodes,
+			y: total
+	})
+	window.mybarChart.update()
 	})
 }
 
