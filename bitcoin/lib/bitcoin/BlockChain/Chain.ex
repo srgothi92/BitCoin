@@ -144,14 +144,10 @@ defmodule BITCOIN.BlockChain.Chain do
       if(block.transactions == []) do
         {:cont, acc}
       else
-        # Single block has only single transaction
-        transactions = Enum.at(block.transactions, 0)
-        case transactions do
-          %Transaction{} ->
-            func.(transactions, acc)
-          _ ->
-            {:cont, acc}
-        end
+        acc = Enum.reduce_while(block.transactions, acc, fn tx, acc ->
+          func.(tx, acc)
+        end)
+        {:cont, acc}
       end
     end)
   end

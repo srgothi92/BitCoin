@@ -99,6 +99,8 @@ function startSimulation() {
 
 function stopSimulation() {
 	stopTimers()
+  	window.lineConfig.data.datasets[0].data = []
+		window.myLineChart.update()
 	$.get("/stopSimulation", function (data) {
 		console.log(data)
 	})

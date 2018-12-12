@@ -66,17 +66,15 @@ defmodule BITCOIN.Server do
   end
 
   def handle_call(:giveRandomInitialMoney, _from, {nodes, nodesValidated, transactionCount}) do
-    Enum.each(nodes, fn nodePid ->
+    txs = Enum.reduce(nodes,[], fn nodePid, acc ->
       su = GenServer.call(nodePid, :getWallet)
-
       suTx =
         Transaction.initialDummyTransaction([
           TxOutput.createTxOutput(su.address, :rand.uniform(100))
         ])
-
-      :ok = GenServer.call(:TransactionQueue, {:addToChain, [suTx]})
+      acc ++ [suTx]
     end)
-
+    :ok = GenServer.call(:TransactionQueue, {:addToChain, txs})
     {:reply, :ok, {nodes, nodesValidated, transactionCount}}
   end
 
