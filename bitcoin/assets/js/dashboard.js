@@ -3,39 +3,7 @@
     gutter: 20, // px
     columns: 12
   });
-  $(function() {
-    var ctx = document.getElementById("lineChart");
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-            datasets: [{
-                label: '# of Votes',
-                backgroundColor: "rgba(155, 89, 182,0.2)",
-                borderColor: "rgba(142, 68, 173,1.0)",
-                pointBackgroundColor: "rgba(142, 68, 173,1.0)",
-                data: [12, 19, 3, 5, 2, 3]
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
-                }]
-            },
-            pan: {
-                enabled: true,
-                mode: 'xy'
-            },
-            zoom: {
-                enabled: true,
-                mode: 'xy',
-            }
-        }
-    })
-});
+
 $(function() {
   var ctx1 = document.getElementById("barChart");
   var myChart1 = new Chart(ctx1, {

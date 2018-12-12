@@ -1,61 +1,120 @@
 <script> require("js/dashboard.js"); 
-    var interval1;
-    var interval2;
-    var interval3;
-   function getTotalAmount(balances) {
-     total = 0;
-     for(var balance in balances) {
-       total = total + balances[balance];
-     }
-     return total;
-   }
+	var interval1;
+var interval2;
+var interval3;
+$(function () {
 
-   function getAllBalance(){
-    $.get("/getAllBalance", function(balances){
-      var total = getTotalAmount(JSON.parse(balances));
-      console.log(total)
-      $(".rect4Number").html(total);
-    })
-   }
+	var ctx = document.getElementById("lineChart");
+	lineConfig = {
+		type: 'line',
+		data: {
+			datasets: [{
+				label: 'Number of Blocks Added over time',
+				backgroundColor: "rgba(155, 89, 182,0.2)",
+				borderColor: "rgba(142, 68, 173,1.0)",
+				pointBackgroundColor: "rgba(142, 68, 173,1.0)",
+				data: []
+			}]
+		},
+		options: {
+      scales: {
+				xAxes: [{
+					type: 'time',
+					time: {
+						displayFormats: {
+							second: 'h:mm:ss a'
+						}
+					},
+					display: true,
+					scaleLabel: {
+						display: true,
+						labelString: 'Date'
+					},
+					ticks: {
+						major: {
+							fontStyle: 'bold',
+							fontColor: '#FF0000'
+						}
+					}
+				}],
+				yAxes: [{
+					display: true,
+					scaleLabel: {
+						ticks: {
+							beginAtZero: true
+						},
+						display: true,
+						labelString: 'value'
+					}
+				}]
+			}
+		}
+	}
+	myLineChart = new Chart(ctx, lineConfig)
+});
 
-   function getTransactionCount() {
-     $.get("/getTransactionCount", function(transactionCount){
-      $(".rect2Number").html(transactionCount);
-    })
-   }
+function getTotalAmount(balances) {
+	total = 0;
+	for (var balance in balances) {
+		total = total + balances[balance];
+	}
+	return total;
+}
 
-   function getBlockCount() {
-     $.get("/getBlockCount", function(blockCount){
-      $(".rect3Number").html(blockCount);
-    })
-   }
+function getAllBalance() {
+	$.get("/getAllBalance", function (balances) {
+		var total = getTotalAmount(JSON.parse(balances));
+		console.log(total)
+		$(".rect4Number").html(total);
+	})
+}
 
-   function startSimulation() {
-     numberOfNodes = $(".num_nodes_input").val();
-     numberOfNodes = numberOfNodes != "" ? numberOfNodes : 10;
-     $(".rect1Number").html(numberOfNodes);
-    $.get("/startSimulation\?numofNodes=" + numberOfNodes, function(data){
-      console.log(data)
-      startTimers()
-    })
-   }
+function getTransactionCount() {
+	$.get("/getTransactionCount", function (transactionCount) {
+		$(".rect2Number").html(transactionCount);
+	});
 
-   function stopSimulation() {
-     stopTimers()
-    $.get("/stopSimulation", function(data){
-      console.log(data)
-    })
-   }
-    function startTimers() {
-      interval1 = window.setInterval(getAllBalance, 2000)
-      interval2 = window.setInterval(getTransactionCount, 2000)
-      interval3 = window.setInterval(getBlockCount, 2000)
-    }
-    function stopTimers() {      
-      clearInterval(interval1);
-      clearInterval(interval2);
-      clearInterval(interval3);
-    }
+}
+
+function getBlockCount() {
+	$.get("/getBlockCount", function (blockCount) {
+		$(".rect3Number").html(blockCount);
+		window.lineConfig.data.datasets[0].data.push({
+			x: new Date(),
+			y: blockCount
+		})
+		window.myLineChart.update()
+	})
+}
+
+function startSimulation() {
+	numberOfNodes = $(".num_nodes_input").val();
+	numberOfNodes = numberOfNodes != "" ? numberOfNodes : 10;
+	$(".rect1Number").html(numberOfNodes);
+	$.get("/startSimulation\?numofNodes=" + numberOfNodes, function (data) {
+		console.log(data)
+		startTimers()
+	})
+}
+
+function stopSimulation() {
+	stopTimers()
+	$.get("/stopSimulation", function (data) {
+		console.log(data)
+	})
+}
+
+function startTimers() {
+	interval1 = window.setInterval(getAllBalance, 2000)
+	interval2 = window.setInterval(getTransactionCount, 2000)
+	interval3 = window.setInterval(getBlockCount, 2000)
+}
+
+function stopTimers() {
+	clearInterval(interval1);
+	clearInterval(interval2);
+	clearInterval(interval3);
+}
    </script>
 <form style = "margin-left:150px">
   No of nodes:&nbsp;&nbsp;&nbsp;&nbsp;
