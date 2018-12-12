@@ -10,44 +10,45 @@ defmodule BITCOIN.Server do
 
   def init(_) do
     nodes = []
-    {:ok, {nodes, %{}}}
+    transactionCount = 0
+    {:ok, {nodes, %{}, transactionCount}}
   end
 
-  def handle_call({:createNodes, count}, _from, {nodes, nodesValidated}) do
+  def handle_call({:createNodes, count}, _from, {nodes, nodesValidated, transactionCount}) do
     nodes =
       Enum.reduce(1..count, nodes, fn _, acc ->
         nodePid = UserNode.start_link()
         acc ++ [elem(nodePid, 1)]
       end)
 
-    {:reply, :ok, {nodes, nodesValidated}}
+    {:reply, :ok, {nodes, nodesValidated, transactionCount}}
   end
 
-  def handle_cast({:broadcastTx, txs}, {nodes, nodesValidated}) do
+  def handle_cast({:broadcastTx, txs}, {nodes, nodesValidated, transactionCount}) do
     GenServer.call(:TransactionQueue, {:addToQueue, txs})
     GenServer.cast(self(), :broadcast_mining_request)
-    {:noreply, {nodes, nodesValidated}}
+    {:noreply, {nodes, nodesValidated, transactionCount}}
   end
 
-  def handle_cast(:broadcast_mining_request, {nodes, nodesValidated}) do
+  def handle_cast(:broadcast_mining_request, {nodes, nodesValidated, transactionCount}) do
     # notify all user to start mining
 
     Enum.each(nodes, fn nodePid ->
       GenServer.call(nodePid, :mining_request)
     end)
 
-    {:noreply, {nodes, nodesValidated}}
+    {:noreply, {nodes, nodesValidated, transactionCount}}
   end
 
-  def handle_cast({:broadCastNewBlock, block, chain}, {nodes, nodesValidated}) do
+  def handle_cast({:broadCastNewBlock, block, chain}, {nodes, nodesValidated, transactionCount}) do
     Enum.each(nodes, fn nodePid ->
       GenServer.cast(nodePid, {:validate_chain, block, chain})
     end)
 
-    {:noreply, {nodes, nodesValidated}}
+    {:noreply, {nodes, nodesValidated, transactionCount}}
   end
 
-  def handle_cast({:validatedBlock, nodePid, block}, {nodes, nodesValidated}) do
+  def handle_cast({:validatedBlock, nodePid, block}, {nodes, nodesValidated, transactionCount}) do
     nodesValidated = Map.put(nodesValidated, nodePid, true)
     nodesValidated =
       if(map_size(nodesValidated) >= div(length(nodes), 2)) do
@@ -61,10 +62,10 @@ defmodule BITCOIN.Server do
         nodesValidated
       end
 
-    {:noreply, {nodes, nodesValidated}}
+    {:noreply, {nodes, nodesValidated, transactionCount}}
   end
 
-  def handle_call(:giveRandomInitialMoney, _from, {nodes, nodesValidated}) do
+  def handle_call(:giveRandomInitialMoney, _from, {nodes, nodesValidated, transactionCount}) do
     Enum.each(nodes, fn nodePid ->
       su = GenServer.call(nodePid, :getWallet)
 
@@ -76,16 +77,17 @@ defmodule BITCOIN.Server do
       :ok = GenServer.call(:TransactionQueue, {:addToChain, [suTx]})
     end)
 
-    {:reply, :ok, {nodes, nodesValidated}}
+    {:reply, :ok, {nodes, nodesValidated, transactionCount}}
   end
 
-  def handle_info(:doRandomTransaction, {nodes, nodesValidated}) do
+  def handle_info(:doRandomTransaction, {nodes, nodesValidated, transactionCount}) do
     su = Enum.at(nodes, :rand.uniform(length(nodes) - 1))
     recipient = Enum.at(nodes, :rand.uniform(length(nodes) - 1))
     recipeintWallet = GenServer.call(recipient, :getWallet)
     GenServer.cast(su, {:transact, :rand.uniform(100), recipeintWallet.address})
+    transactionCount = transactionCount + 1
     Process.send_after(self(), :doRandomTransaction, :rand.uniform(2000))
-    {:noreply, {nodes, nodesValidated}}
+    {:noreply, {nodes, nodesValidated, transactionCount}}
   end
 
   defp getAllBalances(nodes) do
@@ -97,19 +99,23 @@ defmodule BITCOIN.Server do
     balances
   end
 
-  def handle_call(:getAllBalances, _from,  {nodes, nodesValidated}) do
+  def handle_call(:getAllBalances, _from,  {nodes, nodesValidated, transactionCount}) do
     balances = getAllBalances(nodes)
-    {:reply, balances, {nodes, nodesValidated}}
+    {:reply, balances, {nodes, nodesValidated, transactionCount}}
   end
 
-  def handle_call(:stopAllNodes, _from, {nodes, nodesValidated}) do
+  def handle_call(:stopAllNodes, _from, {nodes, nodesValidated, transactionCount}) do
     Enum.each(nodes, fn nodePid ->
-      Process.exit(nodePid, :normal)
+      GenServer.stop(nodePid, :normal)
     end)
-    {:reply, :ok,  {nodes, nodesValidated}}
+    {:reply, :ok,  {nodes, nodesValidated, transactionCount}}
   end
 
-  def handle_info({:DOWN, ref, :process, _pid, _reason}, {nodes, nodesValidated}) do
-    {:noreply,{nodes, nodesValidated}}
+  def handle_call(:getTransactionCount, _from, {nodes, nodesValidated, transactionCount}) do
+    {:reply, transactionCount,  {nodes, nodesValidated, transactionCount}}
   end
+
+  # def handle_info({:DOWN, ref, :process, _pid, _reason}, {nodes, nodesValidated}) do
+  #   {:noreply,{nodes, nodesValidated}}
+  # end
 end

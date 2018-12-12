@@ -1,4 +1,7 @@
 <script> require("js/dashboard.js"); 
+    var interval1;
+    var interval2;
+    var interval3;
    function getTotalAmount(balances) {
      total = 0;
      for(var balance in balances) {
@@ -15,37 +18,57 @@
     })
    }
 
+   function getTransactionCount() {
+     $.get("/getTransactionCount", function(transactionCount){
+      $(".rect2Number").html(transactionCount);
+    })
+   }
+
+   function getBlockCount() {
+     $.get("/getBlockCount", function(blockCount){
+      $(".rect3Number").html(blockCount);
+    })
+   }
+
    function startSimulation() {
      numberOfNodes = $(".num_nodes_input").val();
      numberOfNodes = numberOfNodes != "" ? numberOfNodes : 10;
      $(".rect1Number").html(numberOfNodes);
     $.get("/startSimulation\?numofNodes=" + numberOfNodes, function(data){
       console.log(data)
-      $(".start_simulation").attr("disabled", "disabled");
-      getAllBalance()
+      startTimers()
     })
    }
 
    function stopSimulation() {
+     stopTimers()
     $.get("/stopSimulation", function(data){
-      console.log(data)      
-      $(".start_simulation").attr("enabled", "enabled");
+      console.log(data)
     })
-
-    window.setInterval(getAllBalance(), 2000)
-   }</script>
+   }
+    function startTimers() {
+      interval1 = window.setInterval(getAllBalance, 2000)
+      interval2 = window.setInterval(getTransactionCount, 2000)
+      interval3 = window.setInterval(getBlockCount, 2000)
+    }
+    function stopTimers() {      
+      clearInterval(interval1);
+      clearInterval(interval2);
+      clearInterval(interval3);
+    }
+   </script>
 <form style = "margin-left:150px">
   No of nodes:&nbsp;&nbsp;&nbsp;&nbsp;
-  <input class= "num_nodes_input"type="text" name="noOfNodes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <input class= "num_nodes_input" placeholder="Default Value: 10" type="text" name="noOfNodes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <button class="start_simulation" type="button" onclick="startSimulation()">Start</button>&nbsp;&nbsp;&nbsp;
   <button type="button" onclick="stopSimulation()">Stop</button> <br><br>
 </form>
 
-<div class="rect1" align = "left"><h2 class="rect1Number">0</h2><h2>&nbsp;&nbsp;First rectangle</h2></div>
-<div class="rect2" align = "left"><h2>&nbsp;&nbsp;Second rectangle</h2></div>
-<div class="rect3" align = "left"><h2>&nbsp;&nbsp;Third rectangle</h2></div>
-<div class="rect4" align = "left"><h2 class="rect4Number">0</h2><h2>&nbsp;&nbsp;Fourth rectangle</h2></div><br>
-<br><br><br><br><br><br><br><br><br><br><br><br>
+<div class="rect1" align = "center"><h2 class="rect1Number">0</h2><h2>Total Nodes</h2></div>
+<div class="rect2" align = "center"><h2 class="rect2Number">0</h2><h2>&nbsp;&nbsp;Transaction Count</h2></div>
+<div class="rect3" align = "center"><h2 class="rect3Number">0</h2><h2>Block Added in Chain</h2></div>
+<div class="rect4" align = "center"><h2 class="rect4Number">0</h2><h2>Total Amount in Chain</h2></div><br>
+<br><br><br><br><br><br><br><br>
   <div class="line chart" align = "left">
   <canvas id="lineChart" width="6000" height="4000"  align = "left"></canvas>
   </div>

@@ -176,7 +176,11 @@ defmodule BITCOIN.BlockChain.Chain do
     end)
   end
 
-  def handle_info({:DOWN, ref, :process, _pid, _reason}, {chain}) do
-    {:noreply, {chain}}
+  def handle_call(:getBlockCount, _from, {chain}) do
+    {:reply, length(chain), {chain}}
   end
+
+  # def handle_info({:DOWN, ref, :process, _pid, _reason}, {chain}) do
+  #   {:noreply, {chain}}
+  # end
 end

@@ -14,9 +14,11 @@ defmodule BitcoinWeb.DashboardController do
 
 
   def getTransactionCount(conn, params) do
+    text(conn,GenServer.call(:Server, :getTransactionCount))
   end
 
   def getBlockCount(conn, params) do
+    text(conn,GenServer.call(:Chain, :getBlockCount))
   end
 
   def startSimulation(conn, %{"numofNodes"  => numberOfNodes}) do
@@ -31,9 +33,9 @@ defmodule BitcoinWeb.DashboardController do
 
   def stopSimulation(conn, params) do
     :ok = GenServer.call(:Server, :stopAllNodes)
-    Process.exit(Process.whereis(:Chain), :normal )
-    Process.exit(Process.whereis(:TransactionQueue), :normal )
-    Process.exit(Process.whereis(:Server), :normal )
+    GenServer.stop(Process.whereis(:Chain), :normal )
+    GenServer.stop(Process.whereis(:TransactionQueue), :normal )
+    GenServer.stop(Process.whereis(:Server), :normal )
     text(conn, "stopped")
   end
 end

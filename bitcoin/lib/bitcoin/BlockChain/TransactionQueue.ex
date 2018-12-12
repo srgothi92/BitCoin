@@ -70,8 +70,8 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
     end
   end
 
-  def handle_info({:DOWN, ref, :process, _pid, _reason},{queue}) do
-    Logger.info("Chain Stopped")
-    {:noreply, {queue}}
-  end
+  # def handle_info({:DOWN, ref, :process, _pid, _reason},{queue}) do
+  #   Logger.info("Chain Stopped")
+  #   {:noreply, {queue}}
+  # end
 end

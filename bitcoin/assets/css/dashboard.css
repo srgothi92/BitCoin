@@ -14,39 +14,39 @@
     transform:translateX(-50%);
   }
   .bar.chart {
-    height: 400px;
+    height: auto;
     width: 600px;
     background-color: lightcyan;
     position:absolute;
     left:30;
-    transform:translateX(60%);
+    transform:translateX(58%);
   }
   .rect1 {
-    height: 200px;
+    height: 150px;
     width: 280px;
     background-color: lightcyan;
     position:absolute;
     
-    transform:translateX(-100%);
+    transform:translateX(-107%);
   }
   .rect2 {
-    height: 200px;
+    height: 150px;
     width: 280px;
     background-color: lightcyan;
     position:absolute;
     
-    transform:translateX(15%);
+    transform:translateX(09%);
   }
   .rect3 {
-    height: 200px;
+    height: 150px;
     width: 280px;
     background-color: lightcyan;
     position:absolute;
     
-    transform:translateX(130%);
+    transform:translateX(126%);
   }
   .rect4 {
-    height: 200px;
+    height: 150px;
     width: 280px;
     background-color: lightcyan;
     position:absolute;
