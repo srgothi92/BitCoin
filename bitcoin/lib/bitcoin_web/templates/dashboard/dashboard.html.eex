@@ -2,6 +2,7 @@
 	var interval1;
 var interval2;
 var interval3;
+var timerValue;
 $(function () {
 
 	var ctx = document.getElementById("lineChart");
@@ -28,7 +29,7 @@ $(function () {
 					display: true,
 					scaleLabel: {
 						display: true,
-						labelString: 'Date'
+						labelString: 'Time'
 					},
 					ticks: {
 						major: {
@@ -44,7 +45,7 @@ $(function () {
 							beginAtZero: true
 						},
 						display: true,
-						labelString: 'value'
+						labelString: 'Number of Blocks'
 					}
 				}]
 			}
@@ -122,7 +123,7 @@ function getTransactionCount(callback) {
 
 }
 
-function getBlockCount() {
+function getBlockCount(callback) {
 	$.get("/getBlockCount", function (blockCount) {
 		$(".rect3Number").html(blockCount);
 		window.lineConfig.data.datasets[0].data.push({
@@ -130,6 +131,7 @@ function getBlockCount() {
 			y: blockCount
 		})
 		window.myLineChart.update()
+    callback()
 	})
 }
 
@@ -163,14 +165,27 @@ function stopSimulation() {
 }
 
 function syncSimulation() {
-    getTransactionCount(function(){
-      getAllBalance()
-      getBlockCount()
-    })
+  try {
+    getBlockCount(function(){
+      getTransactionCount(function(){
+        getAllBalance()
+				window.clearTimeout(interval1)
+				interval1 = window.setTimeout(syncSimulation, timerValue)
+      })
+    })   
+  } catch(e) {
+    console.log(e)
+  }
 }
 
 function startTimers() {
-	interval1 = window.setInterval(syncSimulation, 5000)
+  if(numberOfNodes > 50) {
+		timerValue = 20000
+	  interval1 = window.setTimeout(syncSimulation, timerValue)
+  } else { 
+		timerValue = 3000   
+	  interval1 = window.setTimeout(syncSimulation, timerValue)
+  }
 	//interval2 = window.setInterval(getTransactionCount, 5000)
 //	interval3 = window.setInterval(getBlockCount, 5000)
 }

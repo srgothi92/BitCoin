@@ -71,7 +71,7 @@ defmodule BITCOIN.UserNode do
     mining
   end
 
-  def handle_call(:mining_request, _from, {wallet, mining}) do
+  def handle_cast(:mining_request, {wallet, mining}) do
     # use the first block in queue for mining
     blockToMine = GenServer.call(:TransactionQueue, :getBlockFromQueue)
     # get Latest block from chain
@@ -81,9 +81,9 @@ defmodule BITCOIN.UserNode do
 
     if(blockToMine != nil) do
       startMining(blockToMine)
-      {:reply, mining, {wallet, mining}}
+      {:noreply, {wallet, mining}}
     else
-      {:reply, {}, {wallet, mining}}
+      {:noreply, {wallet, mining}}
     end
   end
 
@@ -108,17 +108,18 @@ defmodule BITCOIN.UserNode do
     {:noreply, {wallet, mining}}
   end
 
-  def handle_cast({:validate_chain, blockreceived, retrievedChain}, state) do
+  def handle_call({:validate_chain, blockreceived, retrievedChain}, _from, state) do
     actualChain = GenServer.call(:Chain, :getAllBlocks)
     [previousBlock | _] = actualChain
     result = Chain.validateBlock(previousBlock, blockreceived, actualChain)
 
     if(result != :ok) do
       GenServer.cast(:TransactionQueue, {:removeFromQueue, blockreceived})
+      {:reply, {:error , :invalid_block}, state}
     else
       GenServer.cast(:Server, {:validatedBlock, self(), blockreceived})
     end
 
-    {:noreply, state}
+    {:reply, :ok,  state}
   end
 end

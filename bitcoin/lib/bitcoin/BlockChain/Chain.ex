@@ -129,7 +129,7 @@ defmodule BITCOIN.BlockChain.Chain do
   @doc """
   Returns the amount remaining with a user.
   """
-  def handle_call({:getUnspentOutputsForUser, %Wallet{} = wallet}, _from, {chain}) do
+  def handle_call({:getUnspentOutputsForUser, %Wallet{} = wallet}, _from, {chain, mapInputs}) do
     mapInputs = createAllInputMap(chain)
     # remove all the outputs which have been consumed as input at some point of time
     userOutputs =
