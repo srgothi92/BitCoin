@@ -61,8 +61,8 @@ $(function() {
       labels: [],
       datasets: [
         {
-          label: "Population (millions)",
-          fillColor : getRandomColor(),
+          label: "Balance",
+          backgroundColor : getRandomColor(),
           data: []
         }
       ]
@@ -71,7 +71,7 @@ $(function() {
       legend: { display: false },
       title: {
         display: true,
-        text: 'Predicted world population (millions) in 2050'
+        text: 'Balance'
       },
     pan: {
       enabled: true,
@@ -79,7 +79,7 @@ $(function() {
   },
   zoom: {
       enabled: true,
-      mode: 'xy',
+      mode: 'x',
   }
 }
 }
