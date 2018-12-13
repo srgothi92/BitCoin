@@ -89,7 +89,7 @@ defmodule BITCOIN.UserNode do
 
   def handle_info({:DOWN, ref, :process, _pid, _reason}, {wallet, {pid, mref, block}})
       when ref == mref do
-    GenServer.call(:TransactionQueue, {:removeFromQueue, block})
+    GenServer.cast(:TransactionQueue, {:removeFromQueue, block})
     # mine next block
     # use the first block in queue for mining
     blockToMine = GenServer.call(:TransactionQueue, :getBlockFromQueue)
@@ -114,7 +114,7 @@ defmodule BITCOIN.UserNode do
     result = Chain.validateBlock(previousBlock, blockreceived, actualChain)
 
     if(result != :ok) do
-      GenServer.call(:TransactionQueue, {:removeFromQueue, blockreceived})
+      GenServer.cast(:TransactionQueue, {:removeFromQueue, blockreceived})
     else
       GenServer.cast(:Server, {:validatedBlock, self(), blockreceived})
     end

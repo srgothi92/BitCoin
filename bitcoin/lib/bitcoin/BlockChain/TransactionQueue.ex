@@ -53,12 +53,12 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
     {:reply, :ok, {queue}}
   end
 
-  def handle_call({:removeFromQueue, blockToRemove}, _from, {queue}) do
+  def handle_cast({:removeFromQueue, blockToRemove}, {queue}) do
     queue = Enum.reject(queue, fn block ->
       blockToRemove.timestamp == block.timestamp
     end)
     # Logger.info("Remove block from the queue #{inspect(queue)}")
-    {:reply, :ok, {queue}}
+    {:noreply, {queue}}
   end
 
   def handle_call(:getBlockFromQueue, _from, {queue}) do

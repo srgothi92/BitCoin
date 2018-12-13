@@ -114,9 +114,10 @@ function getAllBalance() {
 })
 }
 
-function getTransactionCount() {
+function getTransactionCount(callback) {
 	$.get("/getTransactionCount", function (transactionCount) {
 		$(".rect2Number").html(transactionCount);
+    callback()
 	});
 
 }
@@ -162,10 +163,17 @@ function stopSimulation() {
 	})
 }
 
+function syncSimulation() {
+    getTransactionCount(function(){
+      getAllBalance()
+      getBlockCount()
+    })
+}
+
 function startTimers() {
-	interval1 = window.setInterval(getAllBalance, 2000)
-	interval2 = window.setInterval(getTransactionCount, 2000)
-	interval3 = window.setInterval(getBlockCount, 2000)
+	interval1 = window.setInterval(syncSimulation, 5000)
+	//interval2 = window.setInterval(getTransactionCount, 5000)
+//	interval3 = window.setInterval(getBlockCount, 5000)
 }
 
 function stopTimers() {
