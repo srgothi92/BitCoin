@@ -92,7 +92,8 @@ defmodule BITCOIN.Server do
     nodes = Enum.with_index(nodes)
     balances = %{}
     balances = Enum.reduce(nodes, balances, fn {nodePid, index}, acc ->
-      Map.put(acc, "node" <> Integer.to_string(index), GenServer.call(nodePid, :balance))
+      balance = GenServer.call(nodePid, :balance)
+      Map.put(acc, "node" <> Integer.to_string(index), balance)
     end)
     balances
   end

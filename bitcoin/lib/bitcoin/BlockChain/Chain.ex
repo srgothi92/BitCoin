@@ -1,5 +1,6 @@
 defmodule BITCOIN.BlockChain.Chain do
   use GenServer
+  require Logger
 
   alias BITCOIN.BlockChain.{Block, Transaction, TransactionVerify}
   alias BITCOIN.Wallet.Wallet
@@ -123,7 +124,7 @@ defmodule BITCOIN.BlockChain.Chain do
       Enum.reject(getUserOutputs(wallet, chain), fn {txHash, outputIndex, _} ->
         MapSet.member?(mapInputs, [txHash, outputIndex])
       end)
-
+Logger.info("Created input map of all transaction")
     {:reply, userOutputs, {chain}}
   end
 
