@@ -58,41 +58,42 @@ $(function() {
   barConfig = {
     type: 'bar',
     data: {
-			datasets: [{
-				label: 'balance',
-				backgroundColor: "rgba(155, 89, 182,0.2)",
-				borderColor: "rgba(142, 68, 173,1.0)",
-				pointBackgroundColor: "rgba(142, 68, 173,1.0)",
-				data: []
-			}]
-		},
+      labels: [],
+      datasets: [
+        {
+          label: "Population (millions)",
+          fillColor : getRandomColor(),
+          data: []
+        }
+      ]
+    },
     options: {
-      scales: {
-				xAxes: [{
-					display: true,
-					scaleLabel: {
-						ticks: {
-							beginAtZero: true
-						},
-						display: true,
-						labelString: 'num of nodes'
-					}
-				}],
-				yAxes: [{
-					display: true,
-					scaleLabel: {
-						ticks: {
-							beginAtZero: true
-						},
-						display: true,
-						labelString: 'value'
-					}
-				}]
-			}
-		}
+      legend: { display: false },
+      title: {
+        display: true,
+        text: 'Predicted world population (millions) in 2050'
+      },
+    pan: {
+      enabled: true,
+      mode: 'xy'
+  },
+  zoom: {
+      enabled: true,
+      mode: 'xy',
   }
-		mybarChart = new Chart(ctx1, barConfig)
-  });
+}
+}
+	mybarChart = new Chart(ctx1, barConfig)
+});
+	
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 function getTotalAmount(balances) {
 	total = 0;
@@ -104,16 +105,13 @@ function getTotalAmount(balances) {
 
 function getAllBalance() {
 	$.get("/getAllBalance", function (balances) {
-		var total = getTotalAmount(JSON.parse(balances));
+		balances = JSON.parse(balances);
+		var total = getTotalAmount(balances);
 		console.log(total)
 		$(".rect1Number").html(numberOfNodes);
-		$(".rect4Number").html(total);
-		window.barConfig.data.datasets[0].data.push({
-			x: numberOfNodes,
-			y: total
-	})
-	window.mybarChart.update()
-	})
+ 		$(".rect4Number").html(total);
+		getBardata(balances);
+})
 }
 
 function getTransactionCount() {
@@ -132,6 +130,17 @@ function getBlockCount() {
 		})
 		window.myLineChart.update()
 	})
+}
+
+function getBardata(balances) {
+		var nodes = Object.keys(balances)
+		var bal = nodes.map(function(key) {
+  	return balances[key];
+});
+		debugger;
+		window.barConfig.data.labels = nodes
+		window.barConfig.data.datasets[0].data = bal
+		window.mybarChart.update()
 }
 
 function startSimulation() {
