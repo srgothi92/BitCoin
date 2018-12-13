@@ -14,7 +14,11 @@ UFID: 8916-9425 Sivani Sri Sruthi Korukonda
 To run the code for this project, simply run in your terminal:
 
 ```elixir
-$ mix compile
+$ mix deps.get
+$ cd assets
+$ npm install
+$ cd ..
+$ mix phx.server
 ```
 
 ## Tests
@@ -45,6 +49,14 @@ KeyHandler_test verifies whether the encrypted message is valid or not
 4.TransactionTest
 
 Transaction_test checks the creation of transaction based on the given input and output.
+
+## Dashboard
+
+The dashboard showcases the ongoing simulation for a given number of nodes.
+The number of nodes can be specified and when the start button is clicked, the transactions begin. When the number of nodes are not specified, it takes a default value of 10 nodes.
+The transaction count, numbers of blocks and the total amount in the chain can be seen on the dashboard.
+The line chart showcases the number of blocks in the chain for a particular time.
+The bar graph showcases the amount each node has.
 
 ## Documentation
 
