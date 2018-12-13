@@ -41,7 +41,6 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
     block = %{block | index: previousBlock.index + 1}
     block = Utility.computeHash(block)
     op = GenServer.call(:Chain, {:addBlock, block})
-    Logger.info("New Block added #{inspect(op)}")
     {:reply, op, {[]}}
   end
 

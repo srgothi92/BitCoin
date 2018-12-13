@@ -106,25 +106,30 @@ function getTotalAmount(balances) {
 
 function getAllBalance() {
 	$.get("/getAllBalance", function (balances) {
+		if(balances != "Timed out") {
 		balances = JSON.parse(balances);
 		var total = getTotalAmount(balances);
 		console.log(total)
 		$(".rect1Number").html(numberOfNodes);
  		$(".rect4Number").html(total);
 		getBardata(balances);
+		}
 })
 }
 
 function getTransactionCount(callback) {
-	$.get("/getTransactionCount", function (transactionCount) {
+	$.get("/getTransactionCount", function (transactionCount) {		
+		if(transactionCount != "Timed out") {
 		$(".rect2Number").html(transactionCount);
     callback()
+		}
 	});
 
 }
 
 function getBlockCount(callback) {
-	$.get("/getBlockCount", function (blockCount) {
+	$.get("/getBlockCount", function (blockCount) {		
+		if(blockCount != "Timed out") {
 		$(".rect3Number").html(blockCount);
 		window.lineConfig.data.datasets[0].data.push({
 			x: new Date(),
@@ -132,6 +137,7 @@ function getBlockCount(callback) {
 		})
 		window.myLineChart.update()
     callback()
+		}
 	})
 }
 

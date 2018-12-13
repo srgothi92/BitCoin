@@ -97,13 +97,13 @@ defmodule BITCOIN.Wallet.Wallet do
   end
 
   def transact(%__MODULE__{} = wallet, amount, recepient) do
-    Logger.info("Requested a transaction worth amount #{inspect(amount)}")
+    # Logger.info("Requested a transaction worth amount #{inspect(amount)}")
     tx = createTransaction(wallet, amount, recepient)
     if(tx != nil) do
-      Logger.info("Created transaction")
+      # Logger.info("Created transaction")
       GenServer.cast(:Server, {:broadcastTx, [tx]})
     else
-      Logger.info("Transaction not created, :not_enough_coins")
+      # Logger.info("Transaction not created, :not_enough_coins")
     end
   end
 

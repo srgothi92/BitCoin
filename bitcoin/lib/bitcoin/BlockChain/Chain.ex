@@ -19,7 +19,8 @@ defmodule BITCOIN.BlockChain.Chain do
   """
   def init(_) do
     chain = [Block.initialBlock()]
-    {:ok, {chain}}
+    mapInputs = MapSet.new()
+    {:ok, {chain, mapInputs}}
   end
 
   @doc """
@@ -85,9 +86,9 @@ defmodule BITCOIN.BlockChain.Chain do
   @doc """
   Returns the latest block in the chain.
   """
-  def handle_call(:getLatestBlock, _from, {chain}) do
+  def handle_call(:getLatestBlock, _from, {chain, mapInputs}) do
     [prevBlock | _] = chain
-    {:reply, prevBlock, {chain}}
+    {:reply, prevBlock, {chain, mapInputs}}
   end
 
   @doc """
@@ -95,48 +96,50 @@ defmodule BITCOIN.BlockChain.Chain do
   Returns an error if the chain is not valid
   Returns the chain containing the added block if it is valid.
   """
-  def handle_call({:addBlock, %Block{} = block}, _from, {chain}) do
+  def handle_call({:addBlock, %Block{} = block}, _from, {chain, mapInputs}) do
     [prevBlock | _] = chain
 
     case validateBlock(prevBlock, block, chain) do
       {:error, reason} ->
-        {:reply, {:error, reason}, {chain}}
+        {:reply, {:error, reason}, {chain, mapInputs}}
 
       :ok ->
-        {:reply, :ok, {[block] ++ chain}}
+        mapInputs = createAllInputMap(chain)
+        {:reply, :ok, {[block] ++ chain, mapInputs}}
     end
   end
 
-  def handle_cast({:addBlockAsync, %Block{} = block}, {chain}) do
+  def handle_cast({:addBlockAsync, %Block{} = block}, {chain, mapInputs}) do
     [prevBlock | _] = chain
 
     case validateBlock(prevBlock, block, chain) do
       {:error, reason} ->
-        {:noreply, {chain}}
+        {:noreply, {chain, mapInputs}}
 
       :ok ->
-        {:noreply, {[block] ++ chain}}
+        mapInputs = createAllInputMap(chain)
+        Logger.info("Block Added")
+        {:noreply, {[block] ++ chain, mapInputs}}
     end
   end
 
   @doc """
   Returns the chain containing all the blocks.
   """
-  def handle_call(:getAllBlocks, _from, {chain}) do
-    {:reply, chain, {chain}}
+  def handle_call(:getAllBlocks, _from, {chain, mapInputs}) do
+    {:reply, chain, {chain, mapInputs}}
   end
 
   @doc """
   Returns the amount remaining with a user.
   """
   def handle_call({:getUnspentOutputsForUser, %Wallet{} = wallet}, _from, {chain, mapInputs}) do
-    mapInputs = createAllInputMap(chain)
     # remove all the outputs which have been consumed as input at some point of time
     userOutputs =
       Enum.reject(getUserOutputs(wallet, chain), fn {txHash, outputIndex, _} ->
         MapSet.member?(mapInputs, [txHash, outputIndex])
       end)
-    {:reply, userOutputs, {chain}}
+    {:reply, userOutputs, {chain, mapInputs}}
   end
 
   # returns all the inputs in complete block chain as map set
@@ -184,11 +187,11 @@ defmodule BITCOIN.BlockChain.Chain do
     end)
   end
 
-  def handle_call(:getBlockCount, _from, {chain}) do
-    {:reply, length(chain), {chain}}
+  def handle_call(:getBlockCount, _from, {chain, mapInputs}) do
+    {:reply, length(chain), {chain, mapInputs}}
   end
 
-  # def handle_info({:DOWN, ref, :process, _pid, _reason}, {chain}) do
-  #   {:noreply, {chain}}
+  # def handle_info({:DOWN, ref, :process, _pid, _reason}, {chain, mapInputs}) do
+  #   {:noreply, {chain, mapInputs}}
   # end
 end

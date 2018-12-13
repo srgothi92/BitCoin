@@ -7,7 +7,7 @@ defmodule BitcoinWeb.DashboardController do
 
   def getAllBalance(conn, params) do
     try do
-      result = GenServer.call(:Server, :getAllBalances)
+      result = GenServer.call(:Server, :getAllBalances, 15000)
       result = Poison.encode!(result)
       text(conn, result)
     catch
@@ -18,7 +18,7 @@ defmodule BitcoinWeb.DashboardController do
 
   def getTransactionCount(conn, params) do
     try do
-      value = GenServer.call(:Server, :getTransactionCount)
+      value = GenServer.call(:Server, :getTransactionCount,15000)
 
       text(conn, value)
     catch
@@ -29,7 +29,7 @@ defmodule BitcoinWeb.DashboardController do
 
   def getBlockCount(conn, params) do
     try do
-      text(conn, GenServer.call(:Chain, :getBlockCount))
+      text(conn, GenServer.call(:Chain, :getBlockCount,15000))
     catch
       :exit, reason ->
         text(conn, "Timed out")
