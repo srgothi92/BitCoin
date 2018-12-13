@@ -108,8 +108,8 @@ defmodule BITCOIN.Server do
       balance = GenServer.call(nodePid, :balance)
       Map.put(acc, "node" <> Integer.to_string(index), balance)
     end)
-    balances
     Logger.info("Ended get all balances")
+    balances
   end
 
   def handle_call(:getAllBalances, _from,  {nodes, nodesValidated, transactionCount}) do
