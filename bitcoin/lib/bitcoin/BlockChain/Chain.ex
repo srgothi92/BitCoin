@@ -107,6 +107,18 @@ defmodule BITCOIN.BlockChain.Chain do
     end
   end
 
+  def handle_cast({:addBlockAsync, %Block{} = block}, {chain}) do
+    [prevBlock | _] = chain
+
+    case validateBlock(prevBlock, block, chain) do
+      {:error, reason} ->
+        {:noreply, {chain}}
+
+      :ok ->
+        {:noreply, {[block] ++ chain}}
+    end
+  end
+
   @doc """
   Returns the chain containing all the blocks.
   """

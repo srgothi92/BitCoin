@@ -138,7 +138,6 @@ function getBardata(balances) {
 		var bal = nodes.map(function(key) {
   	return balances[key];
 });
-		debugger;
 		window.barConfig.data.labels = nodes
 		window.barConfig.data.datasets[0].data = bal
 		window.mybarChart.update()
