@@ -25,6 +25,11 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
   @doc """
   Adds the transaction to queue.
   """
+
+  def handle_call(:getQueue, _from, {queue}) do
+    {:reply, queue, {queue}}
+  end
+
   def addToQueue(%Transaction{} = txs) do
     GenServer.call(__MODULE__, {:addToQueue, txs})
   end

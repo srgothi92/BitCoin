@@ -51,7 +51,9 @@ defmodule BITCOIN.BlockChain.Chain do
         {:error, :invalid_proof_of_work}
 
       true ->
-        TransactionVerify.validateTransactions(block.transactions, chain)
+        result = TransactionVerify.validateTransactions(block.transactions, chain)
+        # Logger.info("#{inspect(result)} : Tx info")
+        result
     end
   end
 

@@ -71,17 +71,18 @@ defmodule BITCOIN.Wallet.Wallet do
       |> Enum.sort(fn {_, _, value1}, {_, _, value2} -> value1 <= value2 end)
       |> chooseOutputs(amount, [])
 
-    case result do
-      {:ok, txInputs} ->
-        txOutputs = [TxOutput.createTxOutput(recepient, amount)]
-        txOutputs = txOutputs ++ calculateChangeOutputs(wallet, amount, txInputs)
-        txInputs = converToInputFormat(txInputs)
-        tx = Transaction.createTransaction(wallet, txInputs, txOutputs)
-        tx
+    tx =
+      case result do
+        {:ok, txInputs} ->
+          txOutputs = [TxOutput.createTxOutput(recepient, amount)]
+          txOutputs = txOutputs ++ calculateChangeOutputs(wallet, amount, txInputs)
+          txInputs = converToInputFormat(txInputs)
+          tx = Transaction.createTransaction(wallet, txInputs, txOutputs)
+          tx
 
-      {:error, _} ->
-        nil
-    end
+        {:error, _} ->
+          nil
+      end
   end
 
   @doc """
@@ -99,6 +100,7 @@ defmodule BITCOIN.Wallet.Wallet do
   def transact(%__MODULE__{} = wallet, amount, recepient) do
     # Logger.info("Requested a transaction worth amount #{inspect(amount)}")
     tx = createTransaction(wallet, amount, recepient)
+
     if(tx != nil) do
       # Logger.info("Created transaction")
       GenServer.cast(:Server, {:broadcastTx, [tx]})
