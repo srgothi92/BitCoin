@@ -1,7 +1,7 @@
 # Bitcoin
 
 To start your Phoenix server:
-
+  * Change directroy to "bitcoin" inside root bitcoin folder.
   * Install dependencies with `mix deps.get`
   * Install Node.js dependencies with `cd assets && npm install`
   * Start Phoenix endpoint with `mix phx.server`
