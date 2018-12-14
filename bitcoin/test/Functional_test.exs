@@ -102,7 +102,7 @@ defmodule BITCOIN.BlockChain.Functional_test do
 
   test "Mu Balance", %{nodeMu: nodeMu} do
     muBalance = GenServer.call(elem(nodeMu, 1), :balance)
-    assert muBalance == 28
+    assert muBalance == 36
   end
 
   test "Lu Balance", %{nodeLu: nodeLu} do
@@ -119,6 +119,6 @@ defmodule BITCOIN.BlockChain.Functional_test do
     suBalance = GenServer.call(elem(nodeSu, 1), :balance)
     muBalance = GenServer.call(elem(nodeMu, 1), :balance)
     assert muBalance == 34
-    assert suBalance == 30
+    assert suBalance == 39
   end
 end

@@ -110,7 +110,7 @@ defmodule BITCOIN.Server do
             1 ->
               Logger.info("Some inputs does not exist")
               # Some inputs does not exist
-              inputs = [TxInput.createTxInput(txExisting.inputs.hash, 1)]
+              inputs = [TxInput.createTxInput(txExisting.hash, 1)]
 
               outputs = [
                 TxOutput.createTxOutput("random Hash", 20)
