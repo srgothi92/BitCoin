@@ -63,5 +63,11 @@ $ mix docs
 This will generate a doc/ directory with a documentation in HTML. 
 To view the documentation, open the index.html file in the generated directory.
 
+## Demo
+
+Video url: https://www.youtube.com/watch?v=0eNbZwAG88M&feature=youtu.be
+
+We have also included a Report.docs file which provides details of the simulation.
+
 
 
