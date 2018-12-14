@@ -48,16 +48,14 @@ defmodule BITCOIN.BlockChain.TransactionQueue do
     block = Utility.createDummyBlock(txs)
     # add new block to the end of the queue
     queue = queue ++ [block]
-    # Logger.info("Added Transaction block to the queue #{inspect(queue)}")
     {:reply, :ok, {queue}}
   end
 
-  def handle_cast({:removeFromQueue, blockToRemove}, {queue}) do
+  def handle_call({:removeFromQueue, blockToRemove}, _from, {queue}) do
     queue = Enum.reject(queue, fn block ->
       blockToRemove.timestamp == block.timestamp
     end)
-    # Logger.info("Remove block from the queue #{inspect(queue)}")
-    {:noreply, {queue}}
+    {:reply,:ok, {queue}}
   end
 
   def handle_call(:getBlockFromQueue, _from, {queue}) do

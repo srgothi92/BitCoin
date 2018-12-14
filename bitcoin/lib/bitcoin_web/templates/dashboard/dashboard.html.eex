@@ -73,15 +73,7 @@ $(function() {
       title: {
         display: true,
         text: 'Balance'
-      },
-    pan: {
-      enabled: true,
-      mode: 'xy'
-  },
-  zoom: {
-      enabled: true,
-      mode: 'x',
-  }
+      }
 }
 }
 	mybarChart = new Chart(ctx1, barConfig)
@@ -186,7 +178,7 @@ function syncSimulation() {
 
 function startTimers() {
   if(numberOfNodes > 50) {
-		timerValue = 20000
+		timerValue = 10000
 	  interval1 = window.setTimeout(syncSimulation, timerValue)
   } else { 
 		timerValue = 3000   

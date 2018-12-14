@@ -53,17 +53,14 @@ defmodule BITCOIN.Server do
   end
 
   def handle_cast({:validatedBlock, nodePid, block}, {nodes, nodesValidated, transactionCount}) do
-    # Logger.info("Started validatedBlock")
+    #  Logger.info("Started validatedBlock")
     nodesValidated = Map.put(nodesValidated, nodePid, true)
 
     nodesValidated =
       if(map_size(nodesValidated) >= div(length(nodes), 2) || length(nodes) > 50) do
-        GenServer.cast(:Chain, {:addBlockAsync, block})
-        GenServer.cast(:TransactionQueue, {:removeFromQueue, block})
+        GenServer.call(:Chain, {:addBlock, block},15000)
+        GenServer.call(:TransactionQueue, {:removeFromQueue, block},15000)
         # Logger.info("Block added")
-        if(length(nodes) > 50) do
-          Process.send_after(self(), :doRandomTransaction, 100)
-        end
         GenServer.cast(self(), :broadcast_mining_request)
         # reset the validation
         %{}
@@ -93,14 +90,17 @@ defmodule BITCOIN.Server do
   end
 
   def handle_info(:doRandomTransaction, {nodes, nodesValidated, transactionCount}) do
+    Logger.info("New Trascation Requested")
     su = Enum.at(nodes, :rand.uniform(length(nodes) - 1))
     recipient = Enum.at(nodes, :rand.uniform(length(nodes) - 1))
-    recipeintWallet = GenServer.call(recipient, :getWallet)
+    recipeintWallet = GenServer.call(recipient, :getWallet,15000)
     GenServer.cast(su, {:transact, :rand.uniform(100), recipeintWallet.address})
     transactionCount = transactionCount + 1
 
     if length(nodes) < 50 do
       Process.send_after(self(), :doRandomTransaction, :rand.uniform(2000))
+    else
+      Process.send_after(self(), :doRandomTransaction,5000)
     end
     {:noreply, {nodes, nodesValidated, transactionCount}}
   end
