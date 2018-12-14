@@ -11,15 +11,17 @@ UFID: 8916-9425 Sivani Sri Sruthi Korukonda
 
 ## Instructions
 
-To run the code for this project, simply run in your terminal:
+To run the simulation for this project, simply run in your terminal:
 
 ```elixir
+$ Change directroy to "bitcoin" inside root bitcoin folder.
 $ mix deps.get
 $ cd assets
 $ npm install
 $ cd ..
 $ mix phx.server
 ```
+It will start a server on port 4000. Open the browser and ping url: localhost:4000/su
 
 ## Tests
 
